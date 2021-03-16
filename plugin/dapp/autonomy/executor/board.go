@@ -5,6 +5,7 @@
 package executor
 
 import (
+	"errors"
 	"github.com/33cn/chain33/system/dapp"
 	"github.com/33cn/chain33/types"
 	auty "github.com/33cn/plugin/plugin/dapp/autonomy/types"
@@ -69,12 +70,12 @@ func (a *Autonomy) getProposalBoard(req *types.ReqString) (types.Message, error)
 	}
 	value, err := a.GetStateDB().Get(propBoardID(req.Data))
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err.Error() + "," + req.Data)
 	}
 	prop := &auty.AutonomyProposalBoard{}
 	err = types.Decode(value, prop)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err.Error() + ", Decode error")
 	}
 	rep := &auty.ReplyQueryProposalBoard{}
 	rep.PropBoards = append(rep.PropBoards, prop)
