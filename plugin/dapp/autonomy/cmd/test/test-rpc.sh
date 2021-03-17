@@ -116,6 +116,11 @@ handleBoards() {
     done
 }
 
+txQuery() {
+    txQuery=$(curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}")
+    echo "$txQuery" | jq
+}
+
 proposalBoardTx() {
     local start=$1
     local end=$2
@@ -124,9 +129,9 @@ proposalBoardTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalBoard query_tx" "$?"
+    txQuery
 }
 
 voteBoardTx() {
@@ -137,8 +142,8 @@ voteBoardTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteBoard query_tx" "$?"
+    txQuery
 }
 
 revokeProposalTx() {
@@ -149,8 +154,8 @@ revokeProposalTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "revoke Proposal $funcName query_tx" "$?"
+    txQuery
 }
 
 terminateProposalTx() {
@@ -161,8 +166,8 @@ terminateProposalTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "terminate Proposal $funcName query_tx" "$?"
+    txQuery
 }
 
 queryProposal() {
@@ -222,9 +227,9 @@ proposalRuleTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalRule query_tx" "$?"
+    txQuery
 }
 
 voteRuleTx() {
@@ -235,8 +240,8 @@ voteRuleTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteRule query_tx" "$?"
+    txQuery
 }
 
 queryActivePropRule() {
@@ -279,9 +284,9 @@ proposalProjectTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalRule query_tx" "$?"
+    txQuery
 }
 
 voteProjectTx() {
@@ -292,8 +297,8 @@ voteProjectTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteRule query_tx" "$?"
+    txQuery
 }
 
 testProposalProject() {
@@ -331,9 +336,9 @@ proposalChangeTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalChange query_tx" "$?"
+    txQuery
 }
 
 voteChangeTx() {
@@ -344,8 +349,8 @@ voteChangeTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteRule query_tx" "$?"
+    txQuery
 }
 
 testProposalChange() {
