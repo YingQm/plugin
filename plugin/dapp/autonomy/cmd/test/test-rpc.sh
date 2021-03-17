@@ -117,9 +117,14 @@ handleBoards() {
     done
 }
 
-txQuery() {
-    txQueryShow=$(curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}")
-    echo "$txQueryShow" | jq
+txQuery () {
+    ty=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}" | jq -r ".receipt.ty")
+    if [[ ${ty} != 2 ]]; then
+        txQueryShow=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}")
+        echo "$txQueryShow"
+        
+        echo_rst "$1 query_tx" 1
+    fi
 }
 
 proposalBoardTx() {
@@ -128,13 +133,10 @@ proposalBoardTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"PropBoard", "payload":{"boards": ['"${boards}"'],"startBlockHeight":'"${start}"',"endBlockHeight":'"${end}"'}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "proposalBoard query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
     echo "$proposalID"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 voteBoardTx() {
@@ -143,12 +145,9 @@ voteBoardTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"VotePropBoard", "payload":{"proposalID": "'"${ID}"'","approve": true}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "voteBoard query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 revokeProposalTx() {
@@ -157,12 +156,9 @@ revokeProposalTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"'"${funcName}"'", "payload":{"proposalID": "'"${ID}"'"}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "revoke Proposal $funcName query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 terminateProposalTx() {
@@ -171,12 +167,9 @@ terminateProposalTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"'"${funcName}"'", "payload":{"proposalID": "'"${ID}"'"}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "terminate Proposal $funcName query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 queryProposal() {
@@ -235,12 +228,11 @@ proposalRuleTx() {
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
     proposalID=$RAW_TX_HASH
     echo "$proposalID"
-    echo_rst "proposalRule query_tx" "$?"
-    txQuery
+    txQuery "$FUNCNAME" "$FUNCNAME"
+
+    echo "ret = $ret"
 }
 
 voteRuleTx() {
@@ -249,12 +241,9 @@ voteRuleTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"VotePropRule", "payload":{"proposalID": "'"${ID}"'","approve": true}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "$FUNCNAME query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 queryActivePropRule() {
@@ -277,14 +266,14 @@ testProposalRule() {
     listProposal 4 "ListProposalRule"
     queryActivePropRule
     #test revoke
-    chain33_LastBlockHeight ${HTTP}
-    start=$((LAST_BLOCK_HEIGHT + 100))
-    end=$((start + 120 + 720))
-    proposalRuleTx ${start} ${end} 2000000000
-    revokeProposalTx "${proposalID}" "RvkPropRule"
-    terminateProposalTx "${proposalID}" "TmintPropRule"
-    queryProposal "${proposalID}" "GetProposalRule"
-    listProposal 2 "ListProposalRule"
+ #   chain33_LastBlockHeight ${HTTP}
+ #   start=$((LAST_BLOCK_HEIGHT + 100))
+ #   end=$((start + 120 + 720))
+ #   proposalRuleTx ${start} ${end} 2000000000
+ #   revokeProposalTx "${proposalID}" "RvkPropRule"
+ #   terminateProposalTx "${proposalID}" "TmintPropRule"
+ #   queryProposal "${proposalID}" "GetProposalRule"
+ #   listProposal 2 "ListProposalRule"
 }
 
 proposalProjectTx() {
@@ -295,13 +284,10 @@ proposalProjectTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"PropProject", "payload":{"amount" : '"${amount}"', "toAddr" : "'"${toAddr}"'","startBlockHeight":'"${start}"',"endBlockHeight":'"${end}"'}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "proposalRule query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
     echo "$proposalID"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 voteProjectTx() {
@@ -310,12 +296,9 @@ voteProjectTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"VotePropProject", "payload":{"proposalID": "'"${ID}"'","approve": true}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
+    chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    echo_rst "$FUNCNAME query_tx" "$?"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 testProposalProject() {
@@ -351,13 +334,10 @@ proposalChangeTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"PropChange", "payload":{"changes" : [{"cancel": '"${cancel}"', "addr":"'"${addr}"'"}],"startBlockHeight":'"${start}"',"endBlockHeight":'"${end}"'}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "proposalChange query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
     echo "$proposalID"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 voteChangeTx() {
@@ -366,12 +346,9 @@ voteChangeTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"VotePropChange", "payload":{"proposalID": "'"${ID}"'","approve": true}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}")
-    echo "$ret"
-    [ "$ret" != "1" ]
-    echo_rst "$FUNCNAME query_tx" "$?"
+    chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    txQuery
+    txQuery "$FUNCNAME"
 }
 
 testProposalChange() {
@@ -452,7 +429,7 @@ init() {
 function run_testcases() {
     echo "run_testcases"
     testProposalRule
-    testProposalBoard
+    #testProposalBoard
     #testProposalProject
     #testProposalChange
 }
