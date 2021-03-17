@@ -124,6 +124,7 @@ proposalBoardTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalBoard query_tx" "$?"
 }
@@ -136,6 +137,7 @@ voteBoardTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteBoard query_tx" "$?"
 }
 
@@ -147,6 +149,7 @@ revokeProposalTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "revoke Proposal $funcName query_tx" "$?"
 }
 
@@ -158,6 +161,7 @@ terminateProposalTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "terminate Proposal $funcName query_tx" "$?"
 }
 
@@ -218,6 +222,7 @@ proposalRuleTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalRule query_tx" "$?"
 }
@@ -230,6 +235,7 @@ voteRuleTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteRule query_tx" "$?"
 }
 
@@ -273,6 +279,7 @@ proposalProjectTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalRule query_tx" "$?"
 }
@@ -285,6 +292,7 @@ voteProjectTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteRule query_tx" "$?"
 }
 
@@ -323,6 +331,7 @@ proposalChangeTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo "$proposalID"
     echo_rst "proposalChange query_tx" "$?"
 }
@@ -335,6 +344,7 @@ voteChangeTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${privk}" "${HTTP}"
     echo "$RAW_TX_HASH"
+    curl -ksd '"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]' "${MAIN_HTTP}"
     echo_rst "voteRule query_tx" "$?"
 }
 
