@@ -122,7 +122,6 @@ txQuery () {
     if [[ ${ty} != 2 ]]; then
         txQueryShow=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}")
         echo "$txQueryShow"
-        
         echo_rst "$1 query_tx" 1
     fi
 }
@@ -266,14 +265,14 @@ testProposalRule() {
     listProposal 4 "ListProposalRule"
     queryActivePropRule
     #test revoke
- #   chain33_LastBlockHeight ${HTTP}
- #   start=$((LAST_BLOCK_HEIGHT + 100))
- #   end=$((start + 120 + 720))
- #   proposalRuleTx ${start} ${end} 2000000000
- #   revokeProposalTx "${proposalID}" "RvkPropRule"
- #   terminateProposalTx "${proposalID}" "TmintPropRule"
- #   queryProposal "${proposalID}" "GetProposalRule"
- #   listProposal 2 "ListProposalRule"
+    chain33_LastBlockHeight ${HTTP}
+    start=$((LAST_BLOCK_HEIGHT + 100))
+    end=$((start + 120 + 720))
+    proposalRuleTx ${start} ${end} 2000000000
+    revokeProposalTx "${proposalID}" "RvkPropRule"
+    terminateProposalTx "${proposalID}" "TmintPropRule"
+    queryProposal "${proposalID}" "GetProposalRule"
+    listProposal 2 "ListProposalRule"
 }
 
 proposalProjectTx() {
@@ -429,9 +428,9 @@ init() {
 function run_testcases() {
     echo "run_testcases"
     testProposalRule
-    #testProposalBoard
-    #testProposalProject
-    #testProposalChange
+    testProposalBoard
+    testProposalProject
+    testProposalChange
 }
 
 function rpc_test() {
