@@ -118,9 +118,9 @@ handleBoards() {
 }
 
 txQuery () {
-    ty=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}" | jq -r ".receipt.ty")
+    ty=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}" | jq -r ".result.receipt.ty")
     if [[ ${ty} != 2 ]]; then
-        txQueryShow=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}")
+        txQueryShow=$(curl -ksd '{"method":"Chain33.QueryTransaction","params":[{"hash":"'"$RAW_TX_HASH"'"}]}' "${HTTP}" | jq -r ".result")
         echo "$txQueryShow"
         echo_rst "$1 query_tx" 1
     fi
