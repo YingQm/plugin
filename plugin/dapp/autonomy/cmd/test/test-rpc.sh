@@ -119,8 +119,7 @@ handleBoards() {
 proposalBoardTx() {
     local start=$1
     local end=$2
-    local propAmount=$3
-    local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"PropBoard", "payload":{"ruleCfg": {"proposalAmount" : '"${propAmount}"'},"boards": ['"${boards}"'],"startBlockHeight":'"${start}"',"endBlockHeight":'"${end}"'}}]}'
+    local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"PropBoard", "payload":{"boards": ['"${boards}"'],"startBlockHeight":'"${start}"',"endBlockHeight":'"${end}"'}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
@@ -148,7 +147,7 @@ revokeProposalTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     echo "$RAW_TX_HASH"
-    echo_rst "revoke Proposal $FUNCNAME query_tx" "$?"
+    echo_rst "revoke Proposal $funcName query_tx" "$?"
 }
 
 terminateProposalTx() {
@@ -191,7 +190,7 @@ testProposalBoard() {
     chain33_LastBlockHeight ${HTTP}
     start=$((LAST_BLOCK_HEIGHT + 10))
     end=$((start + 20 + 720))
-    proposalBoardTx ${start} ${end}  2000000000
+    proposalBoardTx ${start} ${end}
     #vote
     chain33_BlockWait 10 "$HTTP"
     voteBoardTx "${proposalID}" "${votePrKey}"
@@ -203,7 +202,7 @@ testProposalBoard() {
     chain33_LastBlockHeight ${HTTP}
     start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 120 + 720))
-    proposalBoardTx ${start} ${end}  2000000000
+    proposalBoardTx ${start} ${end}
     revokeProposalTx "${proposalID}" "RvkPropBoard"
     terminateProposalTx "${proposalID}" "TmintPropBoard"
     queryProposal "${proposalID}" "GetProposalBoard"
@@ -365,18 +364,20 @@ testProposalChange() {
 }
 
 init() {
-    ispara=$1
+    ispara=$(echo '"'"${HTTP}"'"' | jq '.|contains("8901")')
     echo "ipara=$ispara"
 
-    if [ "$ispara" == false ]; then
-        EXECTOR="autonomy"
-        TICKET_EXECTOR="ticket"
-    else
+    if [ "$ispara" == true ]; then
+        EXECTOR_ADDR=$(curl -ksd '{"method":"Chain33.ConvertExectoAddr","params":[{"execname":"user.p.para.autonomy"}]}' ${HTTP} | jq -r ".result")
         EXECTOR="user.p.para.autonomy"
+        TICKET_ADDR=$(curl -ksd '{"method":"Chain33.ConvertExectoAddr","params":[{"execname":"user.p.para.ticket"}]}' ${HTTP} | jq -r ".result")
         TICKET_EXECTOR="user.p.para.ticket"
+    else
+        EXECTOR_ADDR=$(curl -ksd '{"method":"Chain33.ConvertExectoAddr","params":[{"execname":"autonomy"}]}' ${HTTP} | jq -r ".result")
+        EXECTOR="autonomy"
+        TICKET_ADDR=$(curl -ksd '{"method":"Chain33.ConvertExectoAddr","params":[{"execname":"ticket"}]}' ${HTTP} | jq -r ".result")
+        TICKET_EXECTOR="ticket"
     fi
-    EXECTOR_ADDR=$(curl -ksd '{"method":"Chain33.ConvertExectoAddr","params":[{"execname":"'$EXECTOR'"}]}' ${HTTP} | jq -r ".result")
-    TICKET_ADDR=$(curl -ksd '{"method":"Chain33.ConvertExectoAddr","params":[{"execname":"'TICKET_EXECTOR'"}]}' ${HTTP} | jq -r ".result")
     echo "EXECTOR_ADDR=$EXECTOR_ADDR"
 
     local main_ip=${HTTP//8901/8801}
@@ -416,8 +417,8 @@ function run_testcases() {
     echo "run_testcases"
     testProposalRule
     testProposalBoard
-#    testProposalProject
-#    testProposalChange
+    #testProposalProject
+    #testProposalChange
 }
 
 function rpc_test() {
@@ -426,10 +427,9 @@ function rpc_test() {
     HTTP="$1"
     echo "main_ip=$HTTP"
 
+    init
     ispara=$(echo '"'"${HTTP}"'"' | jq '.|contains("8901")')
     echo "ipara=$ispara"
-
-    init "$ispara"
 
     if [ "$ispara" == true ]; then
         echo "skip autonomy temporary on parachain"
