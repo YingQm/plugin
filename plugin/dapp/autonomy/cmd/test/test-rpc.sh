@@ -134,7 +134,7 @@ proposalBoardTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    echo "$proposalID"
+    echo "roposalID = $proposalID"
     txQuery "$FUNCNAME"
 }
 
@@ -214,7 +214,7 @@ testProposalBoard() {
     end=$((start + 120 + 720))
     proposalBoardTx ${start} ${end}
     revokeProposalTx "${proposalID}" "RvkPropBoard"
-    terminateProposalTx "${proposalID}" "TmintPropBoard"
+    #terminateProposalTx "${proposalID}" "TmintPropBoard"
     queryProposal "${proposalID}" "GetProposalBoard"
     listProposal 2 "ListProposalBoard"
 }
@@ -226,12 +226,10 @@ proposalRuleTx() {
     local req='{"method":"Chain33.CreateTransaction","params":[{"execer":"'"${EXECTOR}"'", "actionName":"PropRule", "payload":{"ruleCfg": {"proposalAmount" : '"${propAmount}"'},"startBlockHeight":'"${start}"',"endBlockHeight":'"${end}"'}}]}'
     echo "${req}"
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
-    ret=$(chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}")
+    chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    echo "$proposalID"
-    txQuery "$FUNCNAME" "$FUNCNAME"
-
-    echo "ret = $ret"
+    echo "proposalID = $proposalID"
+    txQuery "$FUNCNAME"
 }
 
 voteRuleTx() {
@@ -264,15 +262,25 @@ testProposalRule() {
     queryProposal "${proposalID}" "GetProposalRule"
     listProposal 4 "ListProposalRule"
     queryActivePropRule
+
     #test revoke
     chain33_LastBlockHeight ${HTTP}
     start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 120 + 720))
     proposalRuleTx ${start} ${end} 2000000000
     revokeProposalTx "${proposalID}" "RvkPropRule"
-    terminateProposalTx "${proposalID}" "TmintPropRule"
     queryProposal "${proposalID}" "GetProposalRule"
     listProposal 2 "ListProposalRule"
+
+    #test tmintProp
+    chain33_LastBlockHeight ${HTTP}
+    start=$((LAST_BLOCK_HEIGHT + 100))
+    end=$((start + 20 + 720))
+    proposalRuleTx ${start} ${end} 2000000000
+    chain33_BlockWait 840 "$HTTP"
+    terminateProposalTx "${proposalID}" "TmintPropRule"
+    queryProposal "${proposalID}" "GetProposalRule"
+    listProposal 4 "ListProposalRule"
 }
 
 proposalProjectTx() {
@@ -285,7 +293,7 @@ proposalProjectTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    echo "$proposalID"
+    echo "proposalID = $proposalID"
     txQuery "$FUNCNAME"
 }
 
@@ -320,7 +328,7 @@ testProposalProject() {
     end=$((start + 120 + 720))
     proposalProjectTx ${start} ${end} 100000000 ${propAddr}
     revokeProposalTx "${proposalID}" "RvkPropProject"
-    terminateProposalTx "${proposalID}" "TmintPropProject"
+    #terminateProposalTx "${proposalID}" "TmintPropProject"
     queryProposal "${proposalID}" "GetProposalProject"
     listProposal 2 "ListProposalProject"
 }
@@ -335,7 +343,7 @@ proposalChangeTx() {
     chain33_Http "$req" ${HTTP} '(.error|not) and (.result != null)' "$FUNCNAME" ".result"
     chain33_SignAndSendTx "${RETURN_RESP}" "${propKey}" "${HTTP}"
     proposalID=$RAW_TX_HASH
-    echo "$proposalID"
+    echo "proposalID = $proposalID"
     txQuery "$FUNCNAME"
 }
 
@@ -358,7 +366,7 @@ testProposalChange() {
     proposalChangeTx ${start} ${end} "${boardsAddr[20]}" true
     chain33_BlockWait 10 "$HTTP"
     #vote
-    for ((i = 0; i < 14; i++)); do
+    for ((i = 0; i < 11; i++)); do
         voteChangeTx "${proposalID}" "${boardsPrKey[$i]}"
     done
     #query
@@ -370,7 +378,7 @@ testProposalChange() {
     end=$((start + 120 + 720))
     proposalChangeTx ${start} ${end} "${boardsAddr[20]}" false
     revokeProposalTx "${proposalID}" "RvkPropChange"
-    terminateProposalTx "${proposalID}" "TmintPropChange"
+    #terminateProposalTx "${proposalID}" "TmintPropChange"
     queryProposal "${proposalID}" "GetProposalChange"
     listProposal 2 "ListProposalChange"
 }

@@ -140,6 +140,7 @@ func (a *action) votePropChange(voteProb *auty.VoteProposalChange) (*types.Recei
 	}
 	pre := copyAutonomyProposalChange(cur)
 
+	alog.Info("votePropChange_QM ", "addr", a.fromaddr, "status", cur.Status, "ProposalID", voteProb.ProposalID, "cur.CurRule.BoardApproveRatio", cur.CurRule.BoardApproveRatio)
 	// 检查当前状态
 	if cur.Status == auty.AutonomyStatusRvkPropChange ||
 		cur.Status == auty.AutonomyStatusTmintPropChange {

@@ -161,6 +161,8 @@ func (a *action) votePropRule(voteProb *auty.VoteProposalRule) (*types.Receipt, 
 	}
 	pre := copyAutonomyProposalRule(cur)
 
+	alog.Info("votePropRule_QM ", "getProposalRule", voteProb.ProposalID)
+
 	// 检查当前状态
 	if cur.Status == auty.AutonomyStatusRvkPropRule ||
 		cur.Status == auty.AutonomyStatusTmintPropRule {
@@ -180,6 +182,7 @@ func (a *action) votePropRule(voteProb *auty.VoteProposalRule) (*types.Receipt, 
 		return nil, err
 	}
 
+	alog.Info("votePropRule_QM ", "voteProb.OriginAddr", len(voteProb.OriginAddr))
 	if len(voteProb.OriginAddr) > 0 {
 		for _, board := range voteProb.OriginAddr {
 			if err := address.CheckAddress(board); err != nil {
@@ -272,6 +275,7 @@ func (a *action) votePropRule(voteProb *auty.VoteProposalRule) (*types.Receipt, 
 		upRule := upgradeRule(cur.CurRule, cur.PropRule.RuleCfg)
 		kv = append(kv, &types.KeyValue{Key: activeRuleID(), Value: types.Encode(upRule)})
 	}
+	alog.Info("votePropRule_QM ", "VoteResult.Pass", cur.VoteResult.Pass)
 
 	ty := auty.TyLogVotePropRule
 	if cur.VoteResult.Pass {
