@@ -198,25 +198,36 @@ queryActivePropBoard() {
 testProposalBoard() {
     #proposal
     chain33_LastBlockHeight ${HTTP}
-    start=$((LAST_BLOCK_HEIGHT + 10))
+    start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 20 + 720))
     proposalBoardTx ${start} ${end}
     #vote
-    chain33_BlockWait 10 "$HTTP"
+    chain33_BlockWait 100 "$HTTP"
     voteBoardTx "${proposalID}" "${votePrKey}"
     #query
     queryProposal "${proposalID}" "GetProposalBoard"
     listProposal 4 "ListProposalBoard"
     queryActivePropBoard
+
     #test revoke
     chain33_LastBlockHeight ${HTTP}
     start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 120 + 720))
     proposalBoardTx ${start} ${end}
     revokeProposalTx "${proposalID}" "RvkPropBoard"
-    #terminateProposalTx "${proposalID}" "TmintPropBoard"
     queryProposal "${proposalID}" "GetProposalBoard"
     listProposal 2 "ListProposalBoard"
+
+
+    #test terminate
+    chain33_LastBlockHeight ${HTTP}
+    start=$((LAST_BLOCK_HEIGHT + 100))
+    end=$((start + 120 + 720))
+    proposalBoardTx ${start} ${end}
+    chain33_BlockWait 940 "$HTTP"
+    terminateProposalTx "${proposalID}" "TmintPropBoard"
+    queryProposal "${proposalID}" "GetProposalBoard"
+    listProposal 4 "ListProposalBoard"
 }
 
 proposalRuleTx() {
@@ -252,11 +263,11 @@ queryActivePropRule() {
 testProposalRule() {
     # proposal
     chain33_LastBlockHeight ${HTTP}
-    start=$((LAST_BLOCK_HEIGHT + 50))
+    start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 20 + 720))
     proposalRuleTx ${start} ${end} 2000000000
     #vote
-    chain33_BlockWait 50 "$HTTP"
+    chain33_BlockWait 100 "$HTTP"
     voteRuleTx "${proposalID}" ${votePrKey}
     #query
     queryProposal "${proposalID}" "GetProposalRule"
@@ -275,9 +286,9 @@ testProposalRule() {
     #test tmintProp
     chain33_LastBlockHeight ${HTTP}
     start=$((LAST_BLOCK_HEIGHT + 100))
-    end=$((start + 20 + 720))
+    end=$((start + 120 + 720))
     proposalRuleTx ${start} ${end} 2000000000
-    chain33_BlockWait 840 "$HTTP"
+    chain33_BlockWait 940 "$HTTP"
     terminateProposalTx "${proposalID}" "TmintPropRule"
     queryProposal "${proposalID}" "GetProposalRule"
     listProposal 4 "ListProposalRule"
@@ -311,10 +322,10 @@ voteProjectTx() {
 testProposalProject() {
     # proposal
     chain33_LastBlockHeight ${HTTP}
-    start=$((LAST_BLOCK_HEIGHT + 10))
+    start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 20 + 720))
     proposalProjectTx ${start} ${end} 100000000 ${propAddr}
-    chain33_BlockWait 10 "$HTTP"
+    chain33_BlockWait 100 "$HTTP"
     #vote
     for ((i = 0; i < 11; i++)); do
         voteProjectTx "${proposalID}" "${boardsPrKey[$i]}"
@@ -328,9 +339,18 @@ testProposalProject() {
     end=$((start + 120 + 720))
     proposalProjectTx ${start} ${end} 100000000 ${propAddr}
     revokeProposalTx "${proposalID}" "RvkPropProject"
-    #terminateProposalTx "${proposalID}" "TmintPropProject"
     queryProposal "${proposalID}" "GetProposalProject"
     listProposal 2 "ListProposalProject"
+
+    #test terminate
+    chain33_LastBlockHeight ${HTTP}
+    start=$((LAST_BLOCK_HEIGHT + 100))
+    end=$((start + 120 + 720))
+    proposalProjectTx ${start} ${end} 100000000 ${propAddr}
+    chain33_BlockWait 940 "$HTTP"
+    terminateProposalTx "${proposalID}" "TmintPropProject"
+    queryProposal "${proposalID}" "GetProposalProject"
+    listProposal 5 "ListProposalProject"
 }
 
 proposalChangeTx() {
@@ -361,10 +381,10 @@ voteChangeTx() {
 testProposalChange() {
     # proposal
     chain33_LastBlockHeight ${HTTP}
-    start=$((LAST_BLOCK_HEIGHT + 10))
+    start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 20 + 720))
     proposalChangeTx ${start} ${end} "${boardsAddr[20]}" true
-    chain33_BlockWait 10 "$HTTP"
+    chain33_BlockWait 100 "$HTTP"
     #vote
     for ((i = 0; i < 11; i++)); do
         voteChangeTx "${proposalID}" "${boardsPrKey[$i]}"
@@ -372,15 +392,25 @@ testProposalChange() {
     #query
     queryProposal "${proposalID}" "GetProposalChange"
     listProposal 4 "ListProposalChange"
+
     #test revoke
     chain33_LastBlockHeight ${HTTP}
     start=$((LAST_BLOCK_HEIGHT + 100))
     end=$((start + 120 + 720))
     proposalChangeTx ${start} ${end} "${boardsAddr[20]}" false
     revokeProposalTx "${proposalID}" "RvkPropChange"
-    #terminateProposalTx "${proposalID}" "TmintPropChange"
     queryProposal "${proposalID}" "GetProposalChange"
     listProposal 2 "ListProposalChange"
+
+    #test terminateProposalTx
+    chain33_LastBlockHeight ${HTTP}
+    start=$((LAST_BLOCK_HEIGHT + 100))
+    end=$((start + 120 + 720))
+    proposalChangeTx ${start} ${end} "${boardsAddr[20]}" true
+    chain33_BlockWait 940 "$HTTP"
+    terminateProposalTx "${proposalID}" "TmintPropChange"
+    queryProposal "${proposalID}" "GetProposalChange"
+    listProposal 4 "ListProposalChange"
 }
 
 init() {
