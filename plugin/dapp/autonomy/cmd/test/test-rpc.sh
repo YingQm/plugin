@@ -252,11 +252,11 @@ queryActivePropRule() {
 testProposalRule() {
     # proposal
     chain33_LastBlockHeight ${HTTP}
-    start=$((LAST_BLOCK_HEIGHT + 10))
+    start=$((LAST_BLOCK_HEIGHT + 50))
     end=$((start + 20 + 720))
     proposalRuleTx ${start} ${end} 2000000000
     #vote
-    chain33_BlockWait 10 "$HTTP"
+    chain33_BlockWait 50 "$HTTP"
     voteRuleTx "${proposalID}" ${votePrKey}
     #query
     queryProposal "${proposalID}" "GetProposalRule"
