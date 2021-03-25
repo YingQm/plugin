@@ -233,14 +233,14 @@ func (store *privacyStore) getWalletPrivacyTxDetails(param *privacytypes.ReqPriv
 			keyPrefix = calcRecvPrivacyTxKey(param.AssetExec, param.AssetSymbol, param.Address, "")
 		}
 		txKeyBytes = list.IteratorScanFromLast(keyPrefix, param.Count, db.ListDESC)
+
 	} else {
 		if param.SendRecvFlag == sendTx {
-			txKeyBytes = list.IteratorScan([]byte(SendPrivacyTx), calcSendPrivacyTxKey(param.AssetExec, param.AssetSymbol, param.Address, param.StartTxHeightIndex), param.Count, param.Direction
+			txKeyBytes = list.IteratorScan([]byte(SendPrivacyTx), calcSendPrivacyTxKey(param.AssetExec, param.AssetSymbol, param.Address, param.StartTxHeightIndex), param.Count, param.Direction)
 		} else {
 			txKeyBytes = list.IteratorScan([]byte(RecvPrivacyTx), calcRecvPrivacyTxKey(param.AssetExec, param.AssetSymbol, param.Address, param.StartTxHeightIndex), param.Count, param.Direction)
 		}
 	}
-
 	txDetails := &types.WalletTxDetails{}
 	for _, keyByte := range txKeyBytes {
 		value, err := store.Get(keyByte)
@@ -248,6 +248,7 @@ func (store *privacyStore) getWalletPrivacyTxDetails(param *privacytypes.ReqPriv
 			bizlog.Error("getWalletPrivacyTxDetails", "db Get error", err)
 			continue
 		}
+
 		txDetail := &types.WalletTxDetail{}
 		err = types.Decode(value, txDetail)
 		if err != nil {
@@ -259,10 +260,8 @@ func (store *privacyStore) getWalletPrivacyTxDetails(param *privacytypes.ReqPriv
 			//swap from and to
 			txDetail.Fromaddr, txDetail.Tx.To = txDetail.Tx.To, txDetail.Fromaddr
 		}
-
 		txDetails.TxDetails = append(txDetails.TxDetails, txDetail)
 	}
-
 	return txDetails, nil
 }
 

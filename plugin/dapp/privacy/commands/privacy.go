@@ -567,7 +567,7 @@ func listPrivacyTxsFlags(cmd *cobra.Command, args []string) {
 	txHeightIndex, _ := cmd.Flags().GetString("txHeightIndex")
 	exec, _ := cmd.Flags().GetString("exec")
 	params := pty.ReqPrivacyTransactionList{
-		AssetExec:    exec,
+		AssetExec:          exec,
 		AssetSymbol:        symbol,
 		SendRecvFlag:       sendRecvFlag,
 		Direction:          direction,
