@@ -5,7 +5,6 @@ go 1.12
 replace github.com/33cn/dplatformos => ../dplatformos
 
 require (
-	github.com/33cn/chain33 v6.1.0+incompatible
 	github.com/33cn/dplatformos v1.65.1-0.20201111090506-e2d7705ea453
 	github.com/BurntSushi/toml v0.3.1
 	github.com/NebulousLabs/Sia v1.3.7

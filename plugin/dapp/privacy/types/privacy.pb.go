@@ -2942,8 +2942,10 @@ func (m *ReqCreateCacheTxKey) GetHashkey() []byte {
 type ReqPrivacyTransactionList struct {
 	// 1:sendtx  2:recvtx
 	SendRecvFlag int32 `protobuf:"varint,2,opt,name=sendRecvFlag,proto3" json:"sendRecvFlag,omitempty"`
-	Direction    int32 `protobuf:"varint,3,opt,name=direction,proto3" json:"direction,omitempty"`
-	Count        int32 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	// 列表顺序，0降1升
+	Direction int32 `protobuf:"varint,3,opt,name=direction,proto3" json:"direction,omitempty"`
+	// 单次列表数量
+	Count int32 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
 	// 交易相关的地址，发送方或接收方
 	Address string `protobuf:"bytes,6,opt,name=address,proto3" json:"address,omitempty"`
 	// 资产执行器

@@ -563,17 +563,17 @@ func listPrivacyTxsFlags(cmd *cobra.Command, args []string) {
 	direction, _ := cmd.Flags().GetInt32("direction")
 	addr, _ := cmd.Flags().GetString("addr")
 	sendRecvFlag, _ := cmd.Flags().GetInt32("sendrecv")
-	tokenname, _ := cmd.Flags().GetString("token")
-	seedtxhash, _ := cmd.Flags().GetString("seedtxhash")
+	symbol, _ := cmd.Flags().GetString("symbol")
+	txHeightIndex, _ := cmd.Flags().GetString("txHeightIndex")
 	exec, _ := cmd.Flags().GetString("exec")
 	params := pty.ReqPrivacyTransactionList{
-		AssetExec:    exec,
-		Tokenname:    tokenname,
-		SendRecvFlag: sendRecvFlag,
-		Direction:    direction,
-		Count:        count,
-		Address:      addr,
-		Seedtxhash:   []byte(seedtxhash),
+		AssetExec:          exec,
+		AssetSymbol:        symbol,
+		SendRecvFlag:       sendRecvFlag,
+		Direction:          direction,
+		Count:              count,
+		Address:            addr,
+		StartTxHeightIndex: txHeightIndex,
 	}
 	var res rpctypes.WalletTxDetails
 	ctx := jsonclient.NewRPCCtx(rpcLaddr, "privacy.GetPrivacyTxByAddr", params, &res)
