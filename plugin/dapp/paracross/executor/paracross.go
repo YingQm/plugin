@@ -8,12 +8,12 @@ import (
 	"bytes"
 	"encoding/hex"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto"
-	log "github.com/33cn/chain33/common/log/log15"
-	drivers "github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	drivers "github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 )
 
@@ -30,7 +30,7 @@ type Paracross struct {
 }
 
 //Init paracross exec register
-func Init(name string, cfg *types.Chain33Config, sub []byte) {
+func Init(name string, cfg *types.DplatformOSConfig, sub []byte) {
 	drivers.Register(cfg, GetName(), newParacross, cfg.GetDappFork(driverName, "Enable"))
 	InitExecType()
 	setPrefix()
@@ -195,7 +195,7 @@ func (c *Paracross) udpateLocalParaTxs(paraTitle string, paraHeight int64, cross
 
 func (c *Paracross) getAssetTransferInfo(tx *types.Transaction, coinToken string, isWithdraw bool) (*pt.ParacrossAsset, error) {
 	exec := "coins"
-	symbol := types.BTY
+	symbol := types.DPOM
 	if coinToken != "" {
 		exec = "token"
 		symbol = coinToken
@@ -222,7 +222,7 @@ func (c *Paracross) getCrossAssetTransferInfo(payload *pt.CrossAssetTransfer, tx
 	exec := payload.AssetExec
 	symbol := payload.AssetSymbol
 	if payload.AssetSymbol == "" {
-		symbol = types.BTY
+		symbol = types.DPOM
 		exec = "coins"
 	}
 

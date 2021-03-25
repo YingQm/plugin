@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/33cn/chain33/common/address"
-	log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/address"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
 )
 
 var name string
@@ -27,7 +27,7 @@ func init() {
 }
 
 //InitFork ...
-func InitFork(cfg *types.Chain33Config) {
+func InitFork(cfg *types.DplatformOSConfig) {
 	name = UnfreezeX
 	cfg.RegisterDappFork(name, "Enable", 0)
 	cfg.RegisterDappFork(name, ForkTerminatePartX, 1298600)
@@ -35,17 +35,17 @@ func InitFork(cfg *types.Chain33Config) {
 }
 
 //InitExecutor ...
-func InitExecutor(cfg *types.Chain33Config) {
+func InitExecutor(cfg *types.DplatformOSConfig) {
 	types.RegistorExecutor(UnfreezeX, NewType(cfg))
 }
 
 //getRealExecName
-func getRealExecName(cfg *types.Chain33Config, paraName string) string {
+func getRealExecName(cfg *types.DplatformOSConfig, paraName string) string {
 	return cfg.ExecName(paraName + UnfreezeX)
 }
 
 // NewType 生成新的基础类型
-func NewType(cfg *types.Chain33Config) *UnfreezeType {
+func NewType(cfg *types.DplatformOSConfig) *UnfreezeType {
 	c := &UnfreezeType{}
 	c.SetChild(c)
 	c.SetConfig(cfg)
@@ -124,7 +124,7 @@ func (u *UnfreezeType) RPC_UnfreezeCreateTx(parm *UnfreezeCreate) (*types.Transa
 }
 
 // CreateUnfreezeCreateTx 创建冻结合约交易
-func CreateUnfreezeCreateTx(cfg *types.Chain33Config, title string, parm *UnfreezeCreate) (*types.Transaction, error) {
+func CreateUnfreezeCreateTx(cfg *types.DplatformOSConfig, title string, parm *UnfreezeCreate) (*types.Transaction, error) {
 	tlog.Error("CreateUnfreezeCreateTx", "parm", parm)
 	if parm == nil {
 		tlog.Error("RPC_UnfreezeCreateTx", "parm", parm)
@@ -147,7 +147,6 @@ func CreateUnfreezeCreateTx(cfg *types.Chain33Config, title string, parm *Unfree
 		Payload: types.Encode(create),
 		Nonce:   rand.New(rand.NewSource(time.Now().UnixNano())).Int63(),
 		To:      address.ExecAddress(getRealExecName(cfg, cfg.GetParaName())),
-		ChainID: cfg.GetChainID(),
 	}
 	tx.SetRealFee(cfg.GetMinTxFeeRate())
 	return tx, nil
@@ -160,7 +159,7 @@ func (u *UnfreezeType) RPC_UnfreezeWithdrawTx(parm *UnfreezeWithdraw) (*types.Tr
 }
 
 // CreateUnfreezeWithdrawTx 创建提币交易
-func CreateUnfreezeWithdrawTx(cfg *types.Chain33Config, title string, parm *UnfreezeWithdraw) (*types.Transaction, error) {
+func CreateUnfreezeWithdrawTx(cfg *types.DplatformOSConfig, title string, parm *UnfreezeWithdraw) (*types.Transaction, error) {
 	if parm == nil {
 		tlog.Error("RPC_UnfreezeWithdrawTx", "parm", parm)
 		return nil, types.ErrInvalidParam
@@ -177,7 +176,6 @@ func CreateUnfreezeWithdrawTx(cfg *types.Chain33Config, title string, parm *Unfr
 		Payload: types.Encode(withdraw),
 		Nonce:   rand.New(rand.NewSource(time.Now().UnixNano())).Int63(),
 		To:      address.ExecAddress(getRealExecName(cfg, cfg.GetParaName())),
-		ChainID: cfg.GetChainID(),
 	}
 	tx.SetRealFee(cfg.GetMinTxFeeRate())
 	return tx, nil
@@ -190,7 +188,7 @@ func (u *UnfreezeType) RPC_UnfreezeTerminateTx(parm *UnfreezeTerminate) (*types.
 }
 
 // CreateUnfreezeTerminateTx 创建终止冻结合约
-func CreateUnfreezeTerminateTx(cfg *types.Chain33Config, title string, parm *UnfreezeTerminate) (*types.Transaction, error) {
+func CreateUnfreezeTerminateTx(cfg *types.DplatformOSConfig, title string, parm *UnfreezeTerminate) (*types.Transaction, error) {
 	if parm == nil {
 		tlog.Error("RPC_UnfreezeTerminateTx", "parm", parm)
 		return nil, types.ErrInvalidParam
@@ -207,7 +205,6 @@ func CreateUnfreezeTerminateTx(cfg *types.Chain33Config, title string, parm *Unf
 		Payload: types.Encode(terminate),
 		Nonce:   rand.New(rand.NewSource(time.Now().UnixNano())).Int63(),
 		To:      address.ExecAddress(getRealExecName(cfg, cfg.GetParaName())),
-		ChainID: cfg.GetChainID(),
 	}
 	tx.SetRealFee(cfg.GetMinTxFeeRate())
 	return tx, nil

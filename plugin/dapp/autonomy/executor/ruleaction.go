@@ -5,12 +5,12 @@
 package executor
 
 import (
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/types"
 	auty "github.com/33cn/plugin/plugin/dapp/autonomy/types"
 
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/system/dapp"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/system/dapp"
 )
 
 const (

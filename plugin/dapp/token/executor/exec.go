@@ -5,8 +5,8 @@
 package executor
 
 import (
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/types"
 	tokenty "github.com/33cn/plugin/plugin/dapp/token/types"
 )
 

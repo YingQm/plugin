@@ -5,9 +5,9 @@
 package wallet
 
 import (
-	"github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/types"
-	wcom "github.com/33cn/chain33/wallet/common"
+	"github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/types"
+	wcom "github.com/33cn/dplatformos/wallet/common"
 	mtypes "github.com/33cn/plugin/plugin/dapp/multisig/types"
 )
 

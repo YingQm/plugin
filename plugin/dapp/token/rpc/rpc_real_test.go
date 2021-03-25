@@ -7,10 +7,10 @@ package rpc_test
 import (
 	"testing"
 
-	_ "github.com/33cn/chain33/system"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
-	"github.com/33cn/chain33/util/testnode"
+	_ "github.com/33cn/dplatformos/system"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
+	"github.com/33cn/dplatformos/util/testnode"
 	_ "github.com/33cn/plugin/plugin"
 	tokenty "github.com/33cn/plugin/plugin/dapp/token/types"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +31,7 @@ func TestRPCTokenPreCreate(t *testing.T) {
 	acc = mock33.GetAccount(block.StateHash, mock33.GetHotAddress())
 	assert.Equal(t, acc.Balance, 10000*types.Coin)
 
-	tx := util.CreateManageTx(cfg, mock33.GetHotKey(), "token-blacklist", "add", "BTY")
+	tx := util.CreateManageTx(cfg, mock33.GetHotKey(), "token-blacklist", "add", "DPOM")
 	reply, err := mock33.GetAPI().SendTx(tx)
 	assert.Nil(t, err)
 	detail, err := mock33.WaitTx(reply.GetMsg())

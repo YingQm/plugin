@@ -9,12 +9,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	l "github.com/33cn/chain33/common/log/log15"
-	cty "github.com/33cn/chain33/system/dapp/coins/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	l "github.com/33cn/dplatformos/common/log/log15"
+	cty "github.com/33cn/dplatformos/system/dapp/coins/types"
+	"github.com/33cn/dplatformos/types"
 	tokenty "github.com/33cn/plugin/plugin/dapp/token/types"
 )
 
@@ -89,7 +89,7 @@ func (signatory *Signatory) SignTransfer(in *string, out *interface{}) error {
 	amount := 1 * types.Coin
 	v := &types.AssetsTransfer{
 		Amount: amount,
-		Note:   []byte("transfer 1 bty by signatory-server"),
+		Note:   []byte("transfer 1 dpos by signatory-server"),
 	}
 	transfer := &cty.CoinsAction{
 		Ty:    cty.CoinsActionTransfer,

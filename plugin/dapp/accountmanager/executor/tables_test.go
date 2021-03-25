@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	et "github.com/33cn/plugin/plugin/dapp/accountmanager/types"
 )
 

@@ -8,12 +8,10 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"google.golang.org/grpc/credentials"
+	"github.com/33cn/dplatformos/p2p/utils"
 
-	"github.com/33cn/chain33/p2p/utils"
-
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/types"
 )
 
 // NodeInfo is interface object of the node
@@ -34,8 +32,6 @@ type NodeInfo struct {
 	outSide        int32
 	ServiceType    int32
 	channelVersion int32
-	cliCreds       credentials.TransportCredentials
-	servCreds      credentials.TransportCredentials
 }
 
 // NewNodeInfo new a node object
@@ -53,7 +49,6 @@ func NewNodeInfo(p2pCfg *types.P2P, subCfg *subConfig) *NodeInfo {
 	nodeInfo.listenAddr = new(NetAddress)
 	nodeInfo.addrBook = NewAddrBook(p2pCfg, subCfg)
 	nodeInfo.channelVersion = utils.CalcChannelVersion(subCfg.Channel, VERSION)
-
 	return nodeInfo
 }
 

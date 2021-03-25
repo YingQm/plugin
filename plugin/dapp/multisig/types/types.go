@@ -7,7 +7,7 @@ package types
 import (
 	"reflect"
 
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 )
 
 func init() {
@@ -17,12 +17,12 @@ func init() {
 }
 
 //InitFork ...
-func InitFork(cfg *types.Chain33Config) {
+func InitFork(cfg *types.DplatformOSConfig) {
 	cfg.RegisterDappFork(MultiSigX, "Enable", 0)
 }
 
 //InitExecutor ...
-func InitExecutor(cfg *types.Chain33Config) {
+func InitExecutor(cfg *types.DplatformOSConfig) {
 	types.RegistorExecutor(MultiSigX, NewType(cfg))
 }
 
@@ -32,7 +32,7 @@ type MultiSigType struct {
 }
 
 // NewType new一个新的multisig合约实例
-func NewType(cfg *types.Chain33Config) *MultiSigType {
+func NewType(cfg *types.DplatformOSConfig) *MultiSigType {
 	c := &MultiSigType{}
 	c.SetChild(c)
 	c.SetConfig(cfg)

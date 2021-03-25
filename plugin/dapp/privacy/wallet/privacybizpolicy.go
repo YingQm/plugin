@@ -8,12 +8,12 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
-	wcom "github.com/33cn/chain33/wallet/common"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
+	wcom "github.com/33cn/dplatformos/wallet/common"
 	privacytypes "github.com/33cn/plugin/plugin/dapp/privacy/types"
 )
 
@@ -170,28 +170,18 @@ func (policy *privacyPolicy) SignTransaction(key crypto.PrivKey, req *types.ReqS
 	return
 }
 
-type privacyTxInfo struct {
-	tx          *types.Transaction
-	blockDetail *types.BlockDetail
-	actionTy    int32
-	actionName  string
-	input       *privacytypes.PrivacyInput
-	output      *privacytypes.PrivacyOutput
-	txIndex     int32
-	blockHeight int64
-	isExecOk    bool
-	isRollBack  bool
-	txHash      []byte
-	txHashHex   string
-	assetExec   string
-	assetSymbol string
-	batch       db.Batch
-}
-
 type buildStoreWalletTxDetailParam struct {
-	txInfo       *privacyTxInfo
-	addr         string
+	assetExec    string
+	tokenname    string
+	block        *types.BlockDetail
+	tx           *types.Transaction
+	index        int
+	newbatch     db.Batch
+	senderRecver string
+	isprivacy    bool
+	addDelType   int32
 	sendRecvFlag int32
+	utxos        []*privacytypes.UTXO
 }
 
 // OnAddBlockTx 响应区块交易添加的处理

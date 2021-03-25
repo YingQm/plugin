@@ -5,7 +5,7 @@
 package executor
 
 import (
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 )
 
 // ExecDelLocal 回退自动删除，重写基类

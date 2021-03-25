@@ -15,7 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/33cn/chain33/common/crypto"
+	"github.com/33cn/dplatformos/common/crypto"
 	ttypes "github.com/33cn/plugin/plugin/consensus/tendermint/types"
 )
 
@@ -200,7 +200,7 @@ func (node *Node) Start() {
 				ip, _ := splitHostPort(addr)
 				_, ok := node.localIPs[ip]
 				if ok {
-					tendermintlog.Info("find our ip ", "ourIP", ip)
+					tendermintlog.Info("find our ip ", "ourip", ip)
 					node.IP = ip
 					return
 				}
@@ -325,8 +325,6 @@ func (node *Node) UnicastRoutine() {
 		}
 		for _, peer := range node.peerSet.List() {
 			if peer.ID() == msg.PeerID {
-				peerIP, _ := peer.RemoteIP()
-				msg.PeerIP = peerIP.String()
 				success := peer.Send(msg)
 				if !success {
 					tendermintlog.Error("send failure in UnicastRoutine")
@@ -402,7 +400,6 @@ func (node *Node) addPeer(pc *peerConn) error {
 		ID:      node.ID,
 		Network: node.Network,
 		Version: node.Version,
-		IP:      node.IP,
 	}
 	// Exchange NodeInfo on the conn
 	peerNodeInfo, err := pc.HandshakeTimeout(nodeinfo, handshakeTimeout*time.Second)
@@ -463,9 +460,6 @@ func (node *Node) addPeer(pc *peerConn) error {
 	}
 
 	tendermintlog.Info("Added peer", "peer", pc.ip)
-	stateMsg := MsgInfo{TypeID: ttypes.NewRoundStepID, Msg: node.state.RoundStateMessage(), PeerID: pc.id, PeerIP: pc.ip.String()}
-	pc.Send(stateMsg)
-	tendermintlog.Info("Send state msg", "msg", stateMsg, "ourIP", node.IP, "ourID", node.ID)
 	return nil
 }
 
@@ -478,9 +472,6 @@ func (node *Node) Broadcast(msg MsgInfo) chan bool {
 		wg.Add(1)
 		go func(peer Peer) {
 			defer wg.Done()
-			msg.PeerID = peer.ID()
-			peerIP, _ := peer.RemoteIP()
-			msg.PeerIP = peerIP.String()
 			success := peer.Send(msg)
 			successChan <- success
 		}(peer)

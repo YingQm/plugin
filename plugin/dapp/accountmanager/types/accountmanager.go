@@ -3,7 +3,7 @@ package types
 import (
 	"reflect"
 
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 )
 
 /*
@@ -110,12 +110,12 @@ func init() {
 }
 
 // InitFork defines register fork
-func InitFork(cfg *types.Chain33Config) {
+func InitFork(cfg *types.DplatformOSConfig) {
 	cfg.RegisterDappFork(AccountmanagerX, "Enable", 0)
 }
 
 // InitExecutor defines register executor
-func InitExecutor(cfg *types.Chain33Config) {
+func InitExecutor(cfg *types.DplatformOSConfig) {
 	types.RegistorExecutor(AccountmanagerX, NewType(cfg))
 }
 
@@ -125,7 +125,7 @@ type AccountmanagerType struct {
 }
 
 //NewType ...
-func NewType(cfg *types.Chain33Config) *AccountmanagerType {
+func NewType(cfg *types.DplatformOSConfig) *AccountmanagerType {
 	c := &AccountmanagerType{}
 	c.SetChild(c)
 	c.SetConfig(cfg)

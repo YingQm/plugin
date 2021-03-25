@@ -8,9 +8,7 @@ import "crypto/x509"
 
 // CAGenerator CA生成器接口
 type CAGenerator interface {
-	SignCertificate(baseDir, fileName string, sans []string, pub interface{}, isCA bool) (*x509.Certificate, error)
+	SignCertificate(baseDir, name string, sans []string, pub interface{}) (*x509.Certificate, error)
 
-	GenerateLocalOrg(baseDir, fileName string, orgCfg *CertConfig) (CAGenerator, error)
-
-	GenerateLocalUser(baseDir, fileName string) error
+	GenerateLocalUser(baseDir, name string) error
 }

@@ -5,8 +5,8 @@
 package executor
 
 import (
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/types"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/types"
 
 	ptypes "github.com/33cn/plugin/plugin/dapp/js/types"
 )

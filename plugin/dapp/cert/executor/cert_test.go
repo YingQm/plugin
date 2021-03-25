@@ -5,18 +5,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/client"
-	apimock "github.com/33cn/chain33/client/mocks"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	dbm "github.com/33cn/chain33/common/db"
-	_ "github.com/33cn/chain33/system"
-	"github.com/33cn/chain33/system/dapp"
-	pty "github.com/33cn/chain33/system/dapp/manage/types"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/client"
+	apimock "github.com/33cn/dplatformos/client/mocks"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	dbm "github.com/33cn/dplatformos/common/db"
+	_ "github.com/33cn/dplatformos/system"
+	"github.com/33cn/dplatformos/system/dapp"
+	pty "github.com/33cn/dplatformos/system/dapp/manage/types"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	_ "github.com/33cn/plugin/plugin/crypto/init"
 	"github.com/33cn/plugin/plugin/dapp/cert/authority"
 	"github.com/33cn/plugin/plugin/dapp/cert/authority/utils"
@@ -34,7 +34,7 @@ type execEnv struct {
 	api         client.QueueProtocolAPI
 	db          dbm.KV
 	execAddr    string
-	cfg         *types.Chain33Config
+	cfg         *types.DplatformOSConfig
 	ldb         dbm.DB
 	user        *authority.User
 }
@@ -45,8 +45,7 @@ var (
 		[]byte("1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"),
 	}
 	total    = 100 * types.Coin
-	USERNAME = "user1"
-	ORGNAME  = "org1"
+	USERNAME = "User"
 	SIGNTYPE = ct.AuthSM2
 
 	transfer1 = &ct.CertAction{Value: &ct.CertAction_Normal{Normal: &ct.CertNormal{Key: "", Value: nil}}, Ty: ct.CertActionNormal}
@@ -75,8 +74,8 @@ func manageKeySet(key string, value string, db dbm.KV) {
 }
 
 func initEnv() (*execEnv, error) {
-	cfg := types.NewChain33Config(types.ReadFile("./test/chain33.toml"))
-	cfg.SetTitleOnlyForTest("chain33")
+	cfg := types.NewDplatformOSConfig(types.ReadFile("./test/dplatformos.toml"))
+	cfg.SetTitleOnlyForTest("dplatformos")
 
 	sub := cfg.GetSubConfig()
 	var subcfg ct.Authority
@@ -92,7 +91,7 @@ func initEnv() (*execEnv, error) {
 		return nil, err
 	}
 
-	user, err := userLoader.Get(USERNAME, ORGNAME)
+	user, err := userLoader.Get(USERNAME)
 	if err != nil {
 		fmt.Printf("Get user failed")
 		return nil, err

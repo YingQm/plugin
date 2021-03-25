@@ -8,18 +8,18 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/client"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto"
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
-	"github.com/33cn/chain33/wallet"
-	wcom "github.com/33cn/chain33/wallet/common"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/client"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
+	"github.com/33cn/dplatformos/wallet"
+	wcom "github.com/33cn/dplatformos/wallet/common"
 	pty "github.com/33cn/plugin/plugin/dapp/privacy/types"
 
 	pwallet "github.com/33cn/plugin/plugin/dapp/privacy/wallet"
@@ -54,7 +54,7 @@ var (
 	testPolicy     = pwallet.New()
 	testPolicyName = pty.PrivacyX + "test"
 
-	testCfg = types.NewChain33Config(types.GetDefaultCfgstring())
+	testCfg = types.NewDplatformOSConfig(types.GetDefaultCfgstring())
 )
 
 func init() {
@@ -70,7 +70,7 @@ type testExecMock struct {
 	exec    dapp.Driver
 	wallet  *walletMock
 	policy  wcom.WalletBizPolicy
-	cfg     *types.Chain33Config
+	cfg     *types.DplatformOSConfig
 	q       queue.Queue
 	qapi    client.QueueProtocolAPI
 }

@@ -1,8 +1,8 @@
 package executor
 
 import (
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
 	"github.com/robertkrimen/otto"
 )
 

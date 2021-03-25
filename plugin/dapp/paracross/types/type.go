@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"reflect"
 
-	log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
 )
 
 var (
@@ -28,8 +28,6 @@ var (
 	ForkParaSelfConsStages = "ForkParaSelfConsStages"
 	// ForkParaAssetTransferRbk 平行链资产转移平行链失败主链回滚
 	ForkParaAssetTransferRbk = "ForkParaAssetTransferRbk"
-	// ForkParaFullMinerHeight 平行链全挖矿开启高度
-	ForkParaFullMinerHeight = "ForkParaFullMinerHeight"
 
 	// ParaConsSubConf sub
 	ParaConsSubConf = "consensus.sub.para"
@@ -52,7 +50,7 @@ func init() {
 }
 
 //InitFork ...
-func InitFork(cfg *types.Chain33Config) {
+func InitFork(cfg *types.DplatformOSConfig) {
 	cfg.RegisterDappFork(ParaX, "Enable", 0)
 	cfg.RegisterDappFork(ParaX, "ForkParacrossWithdrawFromParachain", 1298600)
 	cfg.RegisterDappFork(ParaX, ForkCommitTx, 1850000)
@@ -61,16 +59,15 @@ func InitFork(cfg *types.Chain33Config) {
 
 	//只在平行链启用
 	cfg.RegisterDappFork(ParaX, ForkParaSelfConsStages, types.MaxHeight)
-	cfg.RegisterDappFork(ParaX, ForkParaFullMinerHeight, types.MaxHeight)
 }
 
 //InitExecutor ...
-func InitExecutor(cfg *types.Chain33Config) {
+func InitExecutor(cfg *types.DplatformOSConfig) {
 	types.RegistorExecutor(ParaX, NewType(cfg))
 }
 
 // GetExecName get para exec name
-func GetExecName(cfg *types.Chain33Config) string {
+func GetExecName(cfg *types.DplatformOSConfig) string {
 	return cfg.ExecName(ParaX)
 }
 
@@ -80,7 +77,7 @@ type ParacrossType struct {
 }
 
 // NewType get paracross type
-func NewType(cfg *types.Chain33Config) *ParacrossType {
+func NewType(cfg *types.DplatformOSConfig) *ParacrossType {
 	c := &ParacrossType{}
 	c.SetChild(c)
 	c.SetConfig(cfg)

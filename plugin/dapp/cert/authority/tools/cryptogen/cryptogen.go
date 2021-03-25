@@ -9,41 +9,46 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/33cn/chain33/common/log/log15"
-	"gopkg.in/yaml.v2"
-
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 	_ "github.com/33cn/plugin/plugin/crypto/init"
 	"github.com/33cn/plugin/plugin/dapp/cert/authority/tools/cryptogen/generator"
+	ca "github.com/33cn/plugin/plugin/dapp/cert/authority/tools/cryptogen/generator/impl"
+	"github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
 )
 
 const (
+	// CANAME 默认CA名称
+	CANAME = "ca"
 	// CONFIGFILENAME 配置文件名
-	CONFIGFILENAME = "chain33.cryptogen.yaml"
+	CONFIGFILENAME = "dplatformos.cryptogen.toml"
 	// OUTPUTDIR 证书文件输出路径
 	OUTPUTDIR = "./authdir/crypto"
+	// ORGNAME 默认组织名
+	ORGNAME = "DplatformOS"
 )
+
+// Config 证书生成工具配置
+type Config struct {
+	Name     []string
+	SignType string
+}
 
 var (
 	cmd = &cobra.Command{
 		Use:   "cryptogen [-f configfile] [-o output directory]",
-		Short: "chain33 crypto tool for generating key and certificate",
+		Short: "dplatformos crypto tool for generating key and certificate",
 		Run:   generate,
 	}
-	cfg    *generator.GenConfig
-	logger = log.New("module", "main")
+	cfg Config
 )
 
-func initCfg(path string) (*generator.GenConfig, error) {
-	conf := &generator.GenConfig{}
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
+func initCfg(path string) *Config {
+	if _, err := toml.DecodeFile(path, &cfg); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
 	}
-
-	yaml.NewDecoder(f).Decode(conf)
-	return conf, nil
+	return &cfg
 }
 
 func main() {
@@ -60,22 +65,19 @@ func generate(cmd *cobra.Command, args []string) {
 	configfile, _ := cmd.Flags().GetString("configfile")
 	outputdir, _ := cmd.Flags().GetString("outputdir")
 
-	var err error
-	cfg, err = initCfg(configfile)
-	if err != nil {
-		panic(err)
-	}
+	initCfg(configfile)
+	fmt.Println(cfg.Name)
 
-	generateCert(outputdir)
-
+	generateUsers(outputdir, ORGNAME)
 }
 
-func generateCert(baseDir string) {
-	logger.Info("generate certs", "dir", baseDir)
+func generateUsers(baseDir string, orgName string) {
+	fmt.Printf("generateUsers\n")
+	fmt.Println(baseDir)
 
 	err := os.RemoveAll(baseDir)
 	if err != nil {
-		logger.Error("clean directory", "error", err.Error())
+		fmt.Printf("Clean directory %s error", baseDir)
 		os.Exit(1)
 	}
 
@@ -83,37 +85,26 @@ func generateCert(baseDir string) {
 
 	signType := types.GetSignType("cert", cfg.SignType)
 	if signType == types.Invalid {
-		logger.Error("invalid sign type", "type", cfg.SignType)
+		fmt.Printf("Invalid sign type:%s", cfg.SignType)
 		return
 	}
 
-	signCA, err := generator.NewCA(caDir, &cfg.Root, signType)
+	signCA, err := ca.NewCA(caDir, CANAME, signType)
 	if err != nil {
-		logger.Error("generating signCA", "error", err.Error())
+		fmt.Printf("Error generating signCA:%s", err.Error())
 		os.Exit(1)
 	}
 
-	for _, org := range cfg.Root.User {
-		generateOrgs(baseDir, signCA, cfg.GetOrgCertConfig(org.Name))
-	}
-
+	generateNodes(baseDir, signCA, orgName)
 }
 
-func generateOrgs(baseDir string, signCA generator.CAGenerator, orgCfg *generator.CertConfig) {
-	orgDir := filepath.Join(baseDir, orgCfg.Name)
-	fileName := fmt.Sprintf("%s@%s", orgCfg.Name, cfg.Root.Name)
-	orgSignCA, err := signCA.GenerateLocalOrg(orgDir, fileName, orgCfg)
-	if err != nil {
-		logger.Error("generating local org", "org", orgCfg.Name, "error", err.Error())
-		os.Exit(1)
-	}
-
-	for _, user := range orgCfg.User {
-		userDir := filepath.Join(orgDir, user.Name)
-		fileName = fmt.Sprintf("%s@%s", user.Name, orgCfg.Name)
-		err := orgSignCA.GenerateLocalUser(userDir, fileName)
+func generateNodes(baseDir string, signCA generator.CAGenerator, orgName string) {
+	for _, name := range cfg.Name {
+		userDir := filepath.Join(baseDir, name)
+		fileName := fmt.Sprintf("%s@%s", name, orgName)
+		err := signCA.GenerateLocalUser(userDir, fileName)
 		if err != nil {
-			logger.Error("generating local user", "user", user.Name, "error", err.Error())
+			fmt.Printf("Error generating local user")
 			os.Exit(1)
 		}
 	}

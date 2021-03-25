@@ -7,8 +7,8 @@ package types
 import (
 	"reflect"
 
-	//log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
+	//log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
 )
 
 // RelayX name for executor
@@ -55,17 +55,17 @@ func init() {
 }
 
 //InitFork ...
-func InitFork(cfg *types.Chain33Config) {
+func InitFork(cfg *types.DplatformOSConfig) {
 	cfg.RegisterDappFork(RelayX, "Enable", 570000)
 }
 
 //InitExecutor ...
-func InitExecutor(cfg *types.Chain33Config) {
+func InitExecutor(cfg *types.DplatformOSConfig) {
 	types.RegistorExecutor(RelayX, NewType(cfg))
 }
 
 // NewType new relay type
-func NewType(cfg *types.Chain33Config) *RelayType {
+func NewType(cfg *types.DplatformOSConfig) *RelayType {
 	c := &RelayType{}
 	c.SetChild(c)
 	c.SetConfig(cfg)
@@ -158,7 +158,7 @@ func (r RelayType) ActionName(tx *types.Transaction) string {
 	return "unknown"
 }
 
-// Amount return relay create bty amount
+// Amount return relay create dpos amount
 func (r *RelayType) Amount(tx *types.Transaction) (int64, error) {
 	data, err := r.DecodePayload(tx)
 	if err != nil {

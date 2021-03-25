@@ -4,17 +4,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/client"
+	"github.com/33cn/dplatformos/client"
 
-	"github.com/33cn/chain33/account"
-	apimock "github.com/33cn/chain33/client/mocks"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto"
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/system/dapp"
-	pty "github.com/33cn/chain33/system/dapp/manage/types"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/account"
+	apimock "github.com/33cn/dplatformos/client/mocks"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/system/dapp"
+	pty "github.com/33cn/dplatformos/system/dapp/manage/types"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	pkt "github.com/33cn/plugin/plugin/dapp/collateralize/types"
 	tokenE "github.com/33cn/plugin/plugin/dapp/token/executor"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +29,7 @@ type execEnv struct {
 	api         client.QueueProtocolAPI
 	db          dbm.KV
 	execAddr    string
-	cfg         *types.Chain33Config
+	cfg         *types.DplatformOSConfig
 	ldb         dbm.DB
 }
 
@@ -75,8 +75,8 @@ func addrKeySet(value string, db dbm.KV) {
 }
 
 func initEnv() *execEnv {
-	cfg := types.NewChain33Config(types.GetDefaultCfgstring())
-	cfg.SetTitleOnlyForTest("chain33")
+	cfg := types.NewDplatformOSConfig(types.GetDefaultCfgstring())
+	cfg.SetTitleOnlyForTest("dplatformos")
 	cfg.RegisterDappFork(pkt.CollateralizeX, pkt.ForkCollateralizeTableUpdate, 0)
 	Init(pkt.CollateralizeX, cfg, nil)
 	_, ldb, kvdb := util.CreateTestDB()

@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/33cn/chain33/types"
+	pb "github.com/33cn/dplatformos/types"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -144,10 +144,6 @@ Retry:
 	keepOp := grpc.KeepaliveParams(keepparm)
 	StatsOp := grpc.StatsHandler(&statshandler{})
 	opts = append(opts, msgRecvOp, msgSendOp, grpc.KeepaliveEnforcementPolicy(kaep), keepOp, maxStreams, StatsOp)
-	if node.nodeInfo.servCreds != nil {
-		opts = append(opts, grpc.Creds(node.nodeInfo.servCreds))
-
-	}
 	dl.server = grpc.NewServer(opts...)
 	dl.p2pserver = pServer
 	pb.RegisterP2PgserviceServer(dl.server, pServer)

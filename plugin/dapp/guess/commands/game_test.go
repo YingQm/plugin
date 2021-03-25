@@ -13,28 +13,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/blockchain"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/limits"
-	"github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/executor"
-	"github.com/33cn/chain33/mempool"
-	"github.com/33cn/chain33/p2p"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/rpc"
-	"github.com/33cn/chain33/store"
-	"github.com/33cn/chain33/system/consensus/solo"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/blockchain"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/limits"
+	"github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/executor"
+	"github.com/33cn/dplatformos/mempool"
+	"github.com/33cn/dplatformos/p2p"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/rpc"
+	"github.com/33cn/dplatformos/store"
+	"github.com/33cn/dplatformos/system/consensus/solo"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 
-	_ "github.com/33cn/chain33/system"
+	_ "github.com/33cn/dplatformos/system"
 	_ "github.com/33cn/plugin/plugin/store/init"
 
-	cty "github.com/33cn/chain33/system/dapp/coins/types"
+	cty "github.com/33cn/dplatformos/system/dapp/coins/types"
 	pty "github.com/33cn/plugin/plugin/dapp/norm/types"
 )
 
@@ -53,7 +53,7 @@ FixTime=false
 loglevel = "info"
 logConsoleLevel = "info"
 # 日志文件名，可带目录，所有生成的日志文件都放到此目录下
-logFile = "logs/chain33.log"
+logFile = "logs/dplatformos.log"
 # 单个日志文件的最大值（单位：兆）
 maxFileSize = 300
 # 最多保存的历史日志文件个数
@@ -224,7 +224,7 @@ enableMavlPrune=false
 # 裁剪高度间隔
 pruneHeight=10000
 [wallet]
-# 交易发送最低手续费，单位0.00000001BTY(1e-8),默认100000，即0.001BTY
+# 交易发送最低手续费，单位0.00000001DPOM(1e-8),默认100000，即0.001DPOM
 minFee=100000
 # walletdb驱动名，支持leveldb/memdb/gobadgerdb/ssdb/pegasus
 driver="leveldb"
@@ -282,7 +282,7 @@ var (
 
 	loopCount = 1
 	conn      *grpc.ClientConn
-	c         types.Chain33Client
+	c         types.DplatformOSClient
 	adminPriv = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
 	adminAddr = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
 
@@ -317,15 +317,15 @@ func Init() {
 	fmt.Println("=======Init Data1!=======")
 	os.RemoveAll("datadir")
 	os.RemoveAll("wallet")
-	os.Remove("chain33.test.toml")
+	os.Remove("dplatformos.test.toml")
 
-	ioutil.WriteFile("chain33.test.toml", []byte(config), 0664)
+	ioutil.WriteFile("dplatformos.test.toml", []byte(config), 0664)
 }
 
 func clearTestData() {
 	fmt.Println("=======start clear test data!=======")
 
-	os.Remove("chain33.test.toml")
+	os.Remove("dplatformos.test.toml")
 	os.RemoveAll("wallet")
 	err := os.RemoveAll("datadir")
 	if err != nil {
@@ -361,7 +361,7 @@ func testGuessImp(t *testing.T) {
 	fmt.Println("=======start NormPut!=======")
 
 	for i := 0; i < loopCount; i++ {
-		NormPut(cfg)
+		NormPut()
 		time.Sleep(time.Second)
 	}
 
@@ -424,26 +424,26 @@ func testGuessImp(t *testing.T) {
 func initEnvGuess() (queue.Queue, *blockchain.BlockChain, queue.Module, queue.Module, *executor.Executor, queue.Module, queue.Module, *cobra.Command) {
 	flag.Parse()
 
-	chain33Cfg := types.NewChain33Config(types.ReadFile("chain33.test.toml"))
+	dplatformosCfg := types.NewDplatformOSConfig(types.ReadFile("dplatformos.test.toml"))
 	var q = queue.New("channel")
-	q.SetConfig(chain33Cfg)
-	cfg := chain33Cfg.GetModuleConfig()
-	sub := chain33Cfg.GetSubConfig()
-	chain := blockchain.New(chain33Cfg)
+	q.SetConfig(dplatformosCfg)
+	cfg := dplatformosCfg.GetModuleConfig()
+	sub := dplatformosCfg.GetSubConfig()
+	chain := blockchain.New(dplatformosCfg)
 	chain.SetQueueClient(q.Client())
 
-	exec := executor.New(chain33Cfg)
+	exec := executor.New(dplatformosCfg)
 	exec.SetQueueClient(q.Client())
-	chain33Cfg.SetMinFee(0)
-	s := store.New(chain33Cfg)
+	dplatformosCfg.SetMinFee(0)
+	s := store.New(dplatformosCfg)
 	s.SetQueueClient(q.Client())
 
 	cs := solo.New(cfg.Consensus, sub.Consensus["solo"])
 	cs.SetQueueClient(q.Client())
 
-	mem := mempool.New(chain33Cfg)
+	mem := mempool.New(dplatformosCfg)
 	mem.SetQueueClient(q.Client())
-	network := p2p.NewP2PMgr(chain33Cfg)
+	network := p2p.NewP2PMgr(dplatformosCfg)
 
 	network.SetQueueClient(q.Client())
 
@@ -467,7 +467,7 @@ func createConn() error {
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	c = types.NewChain33Client(conn)
+	c = types.NewDplatformOSClient(conn)
 	return nil
 }
 
@@ -503,7 +503,7 @@ func getprivkey(key string) crypto.PrivKey {
 	return priv
 }
 
-func prepareTxList(cfg *types.Chain33Config) *types.Transaction {
+func prepareTxList() *types.Transaction {
 	var key string
 	var value string
 	var i int
@@ -516,13 +516,12 @@ func prepareTxList(cfg *types.Chain33Config) *types.Transaction {
 	tx := &types.Transaction{Execer: []byte("norm"), Payload: types.Encode(action), Fee: fee}
 	tx.To = address.ExecAddress("norm")
 	tx.Nonce = random.Int63()
-	tx.ChainID = cfg.GetChainID()
 	tx.Sign(types.SECP256K1, getprivkey("CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"))
 	return tx
 }
 
-func NormPut(cfg *types.Chain33Config) {
-	tx := prepareTxList(cfg)
+func NormPut() {
+	tx := prepareTxList()
 
 	reply, err := c.SendTransaction(context.Background(), tx)
 	if err != nil {
@@ -535,7 +534,7 @@ func NormPut(cfg *types.Chain33Config) {
 	}
 }
 
-func sendTransferTx(cfg *types.Chain33Config, fromKey, to string, amount int64) bool {
+func sendTransferTx(cfg *types.DplatformOSConfig, fromKey, to string, amount int64) bool {
 	signer := util.HexToPrivkey(fromKey)
 	var tx *types.Transaction
 	transfer := &cty.CoinsAction{}
@@ -569,7 +568,7 @@ func sendTransferTx(cfg *types.Chain33Config, fromKey, to string, amount int64) 
 	return true
 }
 
-func sendTransferToExecTx(cfg *types.Chain33Config, fromKey, execName string, amount int64) bool {
+func sendTransferToExecTx(cfg *types.DplatformOSConfig, fromKey, execName string, amount int64) bool {
 	signer := util.HexToPrivkey(fromKey)
 	var tx *types.Transaction
 	transfer := &cty.CoinsAction{}
@@ -608,14 +607,14 @@ func sendTransferToExecTx(cfg *types.Chain33Config, fromKey, execName string, am
 
 func testCmd(cmd *cobra.Command) {
 	var rootCmd = &cobra.Command{
-		Use:   "chain33-cli",
-		Short: "chain33 client tools",
+		Use:   "dplatformos-cli",
+		Short: "dplatformos client tools",
 	}
 
-	chain33Cfg := types.NewChain33Config(types.ReadFile("chain33.test.toml"))
-	types.SetCliSysParam(chain33Cfg.GetTitle(), chain33Cfg)
+	dplatformosCfg := types.NewDplatformOSConfig(types.ReadFile("dplatformos.test.toml"))
+	types.SetCliSysParam(dplatformosCfg.GetTitle(), dplatformosCfg)
 
-	rootCmd.PersistentFlags().String("title", chain33Cfg.GetTitle(), "get title name")
+	rootCmd.PersistentFlags().String("title", dplatformosCfg.GetTitle(), "get title name")
 
 	rootCmd.PersistentFlags().String("rpc_laddr", "http://"+grpcURL, "http url")
 	rootCmd.AddCommand(cmd)

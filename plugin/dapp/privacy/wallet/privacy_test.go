@@ -11,12 +11,12 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	_ "github.com/33cn/chain33/system"
-	"github.com/33cn/chain33/types"
-	wcom "github.com/33cn/chain33/wallet/common"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	_ "github.com/33cn/dplatformos/system"
+	"github.com/33cn/dplatformos/types"
+	wcom "github.com/33cn/dplatformos/wallet/common"
 	privacy "github.com/33cn/plugin/plugin/dapp/privacy/crypto"
 	ty "github.com/33cn/plugin/plugin/dapp/privacy/types"
 )
@@ -31,7 +31,7 @@ type PrivacyMock struct {
 
 func (mock *PrivacyMock) Init(walletOp wcom.WalletOperate, password string) {
 	mock.policy = &privacyPolicy{mtx: &sync.Mutex{}, rescanwg: &sync.WaitGroup{}}
-	mock.tokenName = types.BTY
+	mock.tokenName = types.DPOM
 	mock.walletOp = walletOp
 	mock.password = password
 	mock.policy.Init(walletOp, nil)
@@ -181,7 +181,7 @@ func (mock *PrivacyMock) CreateUTXOs(sender string, pubkeypair string, amount in
 					}
 
 					utxos = append(utxos, utxoCreated)
-					mock.store.setUTXO(info2store, txhashstr, dbbatch)
+					mock.store.setUTXO(info.Addr, &txhashstr, indexoutput, info2store, dbbatch)
 				}
 			}
 		}
@@ -190,7 +190,6 @@ func (mock *PrivacyMock) CreateUTXOs(sender string, pubkeypair string, amount in
 }
 
 func (mock *PrivacyMock) createPublic2PrivacyTx(req *ty.ReqCreatePrivacyTx) *types.Transaction {
-	cfg := mock.walletOp.GetAPI().GetConfig()
 	viewPubSlice, spendPubSlice, err := parseViewSpendPubKeyPair(req.GetPubkeypair())
 	if err != nil {
 		return nil
@@ -218,8 +217,8 @@ func (mock *PrivacyMock) createPublic2PrivacyTx(req *ty.ReqCreatePrivacyTx) *typ
 		Payload: types.Encode(action),
 		Nonce:   mock.walletOp.Nonce(),
 		To:      address.ExecAddress(ty.PrivacyX),
-		ChainID: cfg.GetChainID(),
 	}
+	cfg := mock.walletOp.GetAPI().GetConfig()
 	txSize := types.Size(tx) + ty.SignatureSize
 	realFee := int64((txSize+1023)>>ty.Size1Kshiftlen) * cfg.GetMinTxFeeRate()
 	tx.Fee = realFee

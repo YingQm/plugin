@@ -7,8 +7,8 @@ package types
 import (
 	"reflect"
 
-	"github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
 )
 
 // status

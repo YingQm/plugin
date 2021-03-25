@@ -14,10 +14,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
 	ty "github.com/33cn/plugin/plugin/dapp/relay/types"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
@@ -83,7 +83,7 @@ func NewRelayd(config *Config) *Relayd {
 
 	log.Info("NewRelayd", "current btc hegiht: ", height)
 
-	client33 := NewClient33(&config.Chain33)
+	client33 := NewClient33(&config.DplatformOS)
 	var btc BtcClient
 	if config.BtcdOrWeb == 0 {
 		btc, err = newBtcd(config.Btcd.BitConnConfig(), config.Btcd.ReconnectAttempts)
@@ -216,7 +216,7 @@ out:
 	}
 }
 
-func (r *Relayd) queryChain33WithBtcHeight() (*ty.ReplayRelayQryBTCHeadHeight, error) {
+func (r *Relayd) queryDplatformOSWithBtcHeight() (*ty.ReplayRelayQryBTCHeadHeight, error) {
 	payLoad := types.Encode(&ty.ReqRelayQryBTCHeadHeight{})
 	query := types.ChainExecutor{
 		Driver:   ty.RelayX,
@@ -241,13 +241,13 @@ func (r *Relayd) syncBlockHeaders() {
 
 	knownBtcHeight := atomic.LoadUint64(&r.knownBtcHeight)
 	if knownBtcHeight > r.firstHeaderHeight {
-		ret, err := r.queryChain33WithBtcHeight()
+		ret, err := r.queryDplatformOSWithBtcHeight()
 		if err != nil {
-			log.Error("syncBlockHeaders", "queryChain33WithBtcHeight error: ", err)
+			log.Error("syncBlockHeaders", "queryDplatformOSWithBtcHeight error: ", err)
 			return
 		}
 
-		log.Info("syncBlockHeaders", "queryChain33WithBtcHeight result: ", ret)
+		log.Info("syncBlockHeaders", "queryDplatformOSWithBtcHeight result: ", ret)
 		var initIterHeight uint64
 		if r.firstHeaderHeight != uint64(ret.BaseHeight) && !r.isResetBtcHeight {
 			r.isResetBtcHeight = true
@@ -318,23 +318,17 @@ func (r *Relayd) syncBlockHeaders() {
 }
 
 func (r *Relayd) transaction(payload []byte) *types.Transaction {
-	var chainID int32
-	minFee := types.DefaultMinFee
-
-	//chain33的配置中获取chainID和minFee
-	if r.config.Chain33Cfg != nil {
-		chainID = r.config.Chain33Cfg.GetChainID()
-		minFee = r.config.Chain33Cfg.GetMinTxFeeRate()
-	}
-
 	tx := &types.Transaction{
 		Execer:  []byte(ty.RelayX),
 		Payload: payload,
 		Nonce:   rand.Int63(),
 		To:      address.ExecAddress(ty.RelayX),
-		ChainID: chainID,
 	}
 
+	minFee := types.DefaultMinFee
+	if r.config.DplatformOSCfg != nil {
+		minFee = r.config.DplatformOSCfg.GetMinTxFeeRate()
+	}
 	fee, _ := tx.GetRealFee(minFee)
 	tx.Fee = fee
 	tx.Sign(types.SECP256K1, r.privateKey)

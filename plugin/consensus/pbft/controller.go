@@ -7,9 +7,9 @@ package pbft
 import (
 	"strings"
 
-	log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/queue"
-	pb "github.com/33cn/chain33/types"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/queue"
+	pb "github.com/33cn/dplatformos/types"
 )
 
 var (

@@ -11,16 +11,16 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/33cn/chain33/client"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/queue"
-	drivers "github.com/33cn/chain33/system/dapp"
-	pty "github.com/33cn/chain33/system/dapp/manage/types"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/client"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/queue"
+	drivers "github.com/33cn/dplatformos/system/dapp"
+	pty "github.com/33cn/dplatformos/system/dapp/manage/types"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	rt "github.com/33cn/plugin/plugin/dapp/lottery/types"
 )
 
@@ -34,7 +34,7 @@ var (
 	r            *rand.Rand
 	mydb         db.KV
 	lotteryID    string
-	chainTestCfg *types.Chain33Config
+	chainTestCfg *types.DplatformOSConfig
 )
 
 func init() {
@@ -195,7 +195,7 @@ func ConstructDrawTx() *types.Transaction {
 }
 
 func constructLotteryInstance() drivers.Driver {
-	chainTestCfg = types.NewChain33Config(types.GetDefaultCfgstring())
+	chainTestCfg = types.NewDplatformOSConfig(types.GetDefaultCfgstring())
 	Init(rt.LotteryX, chainTestCfg, nil)
 	lottery := newLottery()
 	//lottery.SetStateDB(NewTestDB())

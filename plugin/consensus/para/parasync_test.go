@@ -7,15 +7,15 @@ package para
 import (
 	"testing"
 
-	"github.com/33cn/chain33/common/crypto"
-	drivers "github.com/33cn/chain33/system/consensus"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/crypto"
+	drivers "github.com/33cn/dplatformos/system/consensus"
+	"github.com/33cn/dplatformos/types"
 
 	"encoding/hex"
 	"sync/atomic"
 
-	"github.com/33cn/chain33/queue"
-	typesmocks "github.com/33cn/chain33/types/mocks"
+	"github.com/33cn/dplatformos/queue"
+	typesmocks "github.com/33cn/dplatformos/types/mocks"
 	"github.com/33cn/plugin/plugin/dapp/paracross/testnode"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 	"github.com/pkg/errors"
@@ -56,7 +56,7 @@ func createParaTestInstance(t *testing.T, q queue.Queue) *client {
 	para.InitClient(q.Client(), initTestSyncBlock)
 
 	//生成rpc Client
-	grpcClient := &typesmocks.Chain33Client{}
+	grpcClient := &typesmocks.DplatformOSClient{}
 	para.grpcClient = grpcClient
 
 	//生成私钥
@@ -350,13 +350,13 @@ func testCreateGenesisBlock(t *testing.T, para *client, testLoopCount int32) {
 
 //测试清理localdb缓存数据
 func testClearLocalOldBlocks(t *testing.T, para *client, testLoopCount int32) {
-	err := para.blockSyncClient.clearLocalOldBlocks()
+	isCleaned, err := para.blockSyncClient.clearLocalOldBlocks()
 
 	switch testLoopCount {
 	case 0:
 		assert.Nil(t, err)
 	case 1:
-		assert.Equal(t, true, err == nil)
+		assert.Equal(t, true, !isCleaned && err == nil)
 	default: //2
 		assert.Error(t, err)
 	}
@@ -432,7 +432,7 @@ func execTest(t *testing.T, para *client, testLoopCount int32) {
 
 //测试入口
 func TestSyncBlocks(t *testing.T) {
-	cfg := types.NewChain33Config(testnode.DefaultConfig)
+	cfg := types.NewDplatformOSConfig(testnode.DefaultConfig)
 	q := queue.New("channel")
 	q.SetConfig(cfg)
 	defer q.Close()

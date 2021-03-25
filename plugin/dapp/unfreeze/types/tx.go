@@ -7,7 +7,7 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 )
 
 type parseUnfreezeCreate struct {

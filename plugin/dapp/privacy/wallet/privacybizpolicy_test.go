@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/blockchain"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/mempool"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/store"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
-	"github.com/33cn/chain33/util/testnode"
-	"github.com/33cn/chain33/wallet"
-	"github.com/33cn/chain33/wallet/bipwallet"
-	wcom "github.com/33cn/chain33/wallet/common"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/blockchain"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/mempool"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/store"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
+	"github.com/33cn/dplatformos/util/testnode"
+	"github.com/33cn/dplatformos/wallet"
+	"github.com/33cn/dplatformos/wallet/bipwallet"
+	wcom "github.com/33cn/dplatformos/wallet/common"
 	ty "github.com/33cn/plugin/plugin/dapp/privacy/types"
 
 	privacy "github.com/33cn/plugin/plugin/dapp/privacy/wallet"
@@ -137,11 +137,11 @@ func (mock *testDataMock) importPrivateKey(PrivKey *types.ReqWalletImportPrivkey
 	var cointype uint32
 	signType := wallet.GetSignType()
 	if signType == 1 {
-		cointype = bipwallet.TypeBty
+		cointype = bipwallet.TypeDpos
 	} else if signType == 2 {
 		cointype = bipwallet.TypeYcc
 	} else {
-		cointype = bipwallet.TypeBty
+		cointype = bipwallet.TypeDpos
 	}
 
 	privkeybyte, err := common.FromHex(PrivKey.Privkey)
@@ -354,7 +354,7 @@ func Test_CreateTransaction(t *testing.T) {
 		{ // 公对私测试
 			req: &ty.ReqCreatePrivacyTx{
 				AssetExec:  "coins",
-				Tokenname:  types.BTY,
+				Tokenname:  types.DPOM,
 				ActionType: ty.ActionPublic2Privacy,
 				Amount:     100 * types.Coin,
 				From:       testAddrs[0],
@@ -365,7 +365,7 @@ func Test_CreateTransaction(t *testing.T) {
 		{ // 私对私测试
 			req: &ty.ReqCreatePrivacyTx{
 				AssetExec:  "coins",
-				Tokenname:  types.BTY,
+				Tokenname:  types.DPOM,
 				ActionType: ty.ActionPrivacy2Privacy,
 				Amount:     10 * types.Coin,
 				From:       testAddrs[0],
@@ -376,7 +376,7 @@ func Test_CreateTransaction(t *testing.T) {
 		{ // 私对公测试
 			req: &ty.ReqCreatePrivacyTx{
 				AssetExec:  "coins",
-				Tokenname:  types.BTY,
+				Tokenname:  types.DPOM,
 				ActionType: ty.ActionPrivacy2Public,
 				Amount:     10 * types.Coin,
 				From:       testAddrs[0],
@@ -406,7 +406,7 @@ func Test_PrivacyAccountInfo(t *testing.T) {
 		{
 			req: &ty.ReqPrivacyAccount{
 				Addr:        testAddrs[0],
-				Token:       types.BTY,
+				Token:       types.DPOM,
 				Displaymode: 0,
 			},
 		},
@@ -432,7 +432,7 @@ func Test_ShowPrivacyAccountSpend(t *testing.T) {
 		{
 			req: &ty.ReqPrivBal4AddrToken{
 				Addr:  testAddrs[0],
-				Token: types.BTY,
+				Token: types.DPOM,
 			},
 			//needError: types.ErrNotFound,
 		},
@@ -457,7 +457,7 @@ func Test_PrivacyTransactionList(t *testing.T) {
 		},
 		{
 			req: &ty.ReqPrivacyTransactionList{
-				AssetSymbol:  types.BTY,
+				Tokenname:    types.DPOM,
 				SendRecvFlag: 1,
 				Direction:    0,
 				Count:        10,

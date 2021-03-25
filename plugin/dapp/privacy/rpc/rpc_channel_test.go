@@ -9,15 +9,15 @@ import (
 	"strings"
 	"testing"
 
-	commonlog "github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/rpc/jsonclient"
-	rpctypes "github.com/33cn/chain33/rpc/types"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util/testnode"
+	commonlog "github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/rpc/jsonclient"
+	rpctypes "github.com/33cn/dplatformos/rpc/types"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util/testnode"
 	pty "github.com/33cn/plugin/plugin/dapp/privacy/types"
 	"github.com/stretchr/testify/assert"
 
-	_ "github.com/33cn/chain33/system"
+	_ "github.com/33cn/dplatformos/system"
 	_ "github.com/33cn/plugin/plugin"
 )
 
@@ -74,7 +74,7 @@ func testShowPrivacyKey(t *testing.T, jrpc *jsonclient.JSONClient) error {
 func testShowPrivacyAccountInfo(t *testing.T, jrpc *jsonclient.JSONClient) error {
 	params := pty.ReqPrivacyAccount{
 		Addr:        "1JSRSwp16NvXiTjYBYK9iUQ9wqp3sCxz2p",
-		Token:       types.BTY,
+		Token:       types.DPOM,
 		Displaymode: 1,
 	}
 	var res pty.ReplyPrivacyAccount
@@ -85,7 +85,7 @@ func testShowPrivacyAccountInfo(t *testing.T, jrpc *jsonclient.JSONClient) error
 func testShowPrivacyAccountSpend(t *testing.T, jrpc *jsonclient.JSONClient) error {
 	params := pty.ReqPrivBal4AddrToken{
 		Addr:  "1JSRSwp16NvXiTjYBYK9iUQ9wqp3sCxz2p",
-		Token: types.BTY,
+		Token: types.DPOM,
 	}
 	var res pty.UTXOHaveTxHashs
 	err := jrpc.Call("privacy.ShowPrivacyAccountSpend", params, &res)
@@ -93,21 +93,21 @@ func testShowPrivacyAccountSpend(t *testing.T, jrpc *jsonclient.JSONClient) erro
 }
 
 func testShowAmountsOfUTXO(t *testing.T, jrpc *jsonclient.JSONClient) error {
-	reqPrivacyToken := pty.ReqPrivacyToken{AssetExec: "coins", AssetSymbol: types.BTY}
+	reqPrivacyToken := pty.ReqPrivacyToken{AssetExec: "coins", AssetSymbol: types.DPOM}
 	var params rpctypes.Query4Jrpc
 	params.Execer = pty.PrivacyX
 	params.FuncName = "ShowAmountsOfUTXO"
 	params.Payload = types.MustPBToJSON(&reqPrivacyToken)
 
 	var res pty.ReplyPrivacyAmounts
-	err := jrpc.Call("Chain33.Query", params, &res)
+	err := jrpc.Call("DplatformOS.Query", params, &res)
 	return err
 }
 
 func testShowUTXOs4SpecifiedAmount(t *testing.T, jrpc *jsonclient.JSONClient) error {
 	reqPrivacyToken := pty.ReqPrivacyToken{
 		AssetExec:   "coins",
-		AssetSymbol: types.BTY,
+		AssetSymbol: types.DPOM,
 		Amount:      123456,
 	}
 	var params rpctypes.Query4Jrpc
@@ -116,17 +116,18 @@ func testShowUTXOs4SpecifiedAmount(t *testing.T, jrpc *jsonclient.JSONClient) er
 	params.Payload = types.MustPBToJSON(&reqPrivacyToken)
 
 	var res pty.ReplyUTXOsOfAmount
-	err := jrpc.Call("Chain33.Query", params, &res)
+	err := jrpc.Call("DplatformOS.Query", params, &res)
 	return err
 }
 
 func testListPrivacyTxs(t *testing.T, jrpc *jsonclient.JSONClient) error {
 	params := pty.ReqPrivacyTransactionList{
-		AssetSymbol:  types.BTY,
+		Tokenname:    types.DPOM,
 		SendRecvFlag: 1,
 		Direction:    1,
 		Count:        16,
 		Address:      "13cS5G1BDN2YfGudsxRxr7X25yu6ZdgxMU",
+		Seedtxhash:   []byte("0xa64296792f90f364371e0b66fdac622080ceb7b2537ff9152e189aa9e88e61bd"),
 	}
 	var res rpctypes.WalletTxDetails
 	err := jrpc.Call("privacy.GetPrivacyTxByAddr", params, &res)

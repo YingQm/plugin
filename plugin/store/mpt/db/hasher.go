@@ -24,8 +24,8 @@ import (
 	"hash"
 	"sync"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto/sha3"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto/sha3"
 	proto "github.com/golang/protobuf/proto"
 )
 

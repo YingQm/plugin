@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/rpc/jsonclient"
-	rpctypes "github.com/33cn/chain33/rpc/types"
-	_ "github.com/33cn/chain33/system"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util/testnode"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/rpc/jsonclient"
+	rpctypes "github.com/33cn/dplatformos/rpc/types"
+	_ "github.com/33cn/dplatformos/system"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util/testnode"
 	_ "github.com/33cn/plugin/plugin"
 	mty "github.com/33cn/plugin/plugin/dapp/multisig/types"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	Symbol     = "BTY"
+	Symbol     = "DPOM"
 	Asset      = "coins"
 	PrivKeyA   = "0x06c0fa653c719275d1baa365c7bc0b9306447287499a715b541b930482eaa504" // 1C5xK2ytuoFqxmVGMcyz9XFKFWcDA8T3rK
 	PrivKeyB   = "0x4c8663cded61093af20339ae038b3c6bfa58a33e65874a655022f82eaf3f2fa0" // 1LDGrokrZjo1HtSmSnw8ef3oy5Vm1nctbj
@@ -46,7 +46,7 @@ var TestPrivkeyHex = []string{
 	"0x5b8ca316cf073aa94f1056a9e3f6e0b9a9ec11ae45862d58c7a09640b4d55302",
 }
 
-func getRPCClient(t *testing.T, mocker *testnode.Chain33Mock) *jsonclient.JSONClient {
+func getRPCClient(t *testing.T, mocker *testnode.DplatformOSMock) *jsonclient.JSONClient {
 	jrpcClient := mocker.GetJSONC()
 	assert.NotNil(t, jrpcClient)
 	return jrpcClient
@@ -76,7 +76,7 @@ func TestMultiSigAccount(t *testing.T) {
 		}
 		//t.Log("import", "index", i, "addr", acc.Acc.Addr)
 	}
-	//创建多重签名账户,owner:AddrA,AddrB,GenAddr,weight:20,10,30;coins:BTY 1000000000 RequestWeight:15
+	//创建多重签名账户,owner:AddrA,AddrB,GenAddr,weight:20,10,30;coins:DPOM 1000000000 RequestWeight:15
 	multiSigAccAddr := testAccCreateTx(t, mocker, jrpcClient)
 
 	//owner add AddrE
@@ -90,7 +90,7 @@ func TestMultiSigAccount(t *testing.T) {
 }
 
 //创建多重签名账户
-func testAccCreateTx(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsonclient.JSONClient) string {
+func testAccCreateTx(t *testing.T, mocker *testnode.DplatformOSMock, jrpcClient *jsonclient.JSONClient) string {
 	gen := mocker.GetGenesisKey()
 	var params rpctypes.Query4Jrpc
 	//1. MultiSigAccCreateTx 创建交易
@@ -128,7 +128,7 @@ func testAccCreateTx(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jso
 	params.FuncName = "MultiSigAccCount"
 	params.Payload = types.MustPBToJSON(&types.ReqNil{})
 	rep := &types.Int64{}
-	err = jrpcClient.Call("Chain33.Query", &params, rep)
+	err = jrpcClient.Call("DplatformOS.Query", &params, rep)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), rep.Data)
 
@@ -142,7 +142,7 @@ func testAccCreateTx(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jso
 	params.FuncName = "MultiSigAccounts"
 	params.Payload = types.MustPBToJSON(&req1)
 	rep1 := &mty.ReplyMultiSigAccs{}
-	err = jrpcClient.Call("Chain33.Query", params, rep1)
+	err = jrpcClient.Call("DplatformOS.Query", params, rep1)
 	assert.Nil(t, err)
 	//t.Log(rep1)
 
@@ -159,7 +159,7 @@ func testAccCreateTx(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jso
 }
 
 //owner add AddrE
-func testAddOwner(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
+func testAddOwner(t *testing.T, mocker *testnode.DplatformOSMock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
 	gen := mocker.GetGenesisKey()
 
 	params9 := &mty.MultiSigOwnerOperate{
@@ -192,7 +192,7 @@ func testAddOwner(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsoncl
 }
 
 //owner del AddrE
-func testDelOwner(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
+func testDelOwner(t *testing.T, mocker *testnode.DplatformOSMock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
 	gen := mocker.GetGenesisKey()
 
 	param := &mty.MultiSigOwnerOperate{
@@ -222,7 +222,7 @@ func testDelOwner(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsoncl
 }
 
 //ModifyOwnerWeight
-func testModifyOwnerWeight(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
+func testModifyOwnerWeight(t *testing.T, mocker *testnode.DplatformOSMock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
 	gen := mocker.GetGenesisKey()
 
 	param := &mty.MultiSigOwnerOperate{
@@ -255,7 +255,7 @@ func testModifyOwnerWeight(t *testing.T, mocker *testnode.Chain33Mock, jrpcClien
 }
 
 //testReplaceOwner owner AddrA replace by  AddrE
-func testReplaceOwner(t *testing.T, mocker *testnode.Chain33Mock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
+func testReplaceOwner(t *testing.T, mocker *testnode.DplatformOSMock, jrpcClient *jsonclient.JSONClient, multiSigAccAddr string) {
 	gen := mocker.GetGenesisKey()
 
 	param := &mty.MultiSigOwnerOperate{

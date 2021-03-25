@@ -7,8 +7,8 @@ package autotest
 import (
 	"reflect"
 
-	"github.com/33cn/chain33/cmd/autotest/types"
-	"github.com/33cn/chain33/system/dapp/coins/autotest"
+	"github.com/33cn/dplatformos/cmd/autotest/types"
+	"github.com/33cn/dplatformos/system/dapp/coins/autotest"
 )
 
 type unfreezeAutoTest struct {

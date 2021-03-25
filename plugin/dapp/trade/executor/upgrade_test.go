@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,7 +77,7 @@ func Test_Upgrade(t *testing.T) {
 }
 
 func callUpgradeLocalDBV2(localdb dbm.KVDB) (*types.LocalDBSet, error) {
-	return UpgradeLocalDBV2(localdb, "bty")
+	return UpgradeLocalDBV2(localdb, "dpos")
 }
 
 // 测试更新后是否删除完全， asset 设置
@@ -117,7 +117,7 @@ func Test_UpgradeOrderAsset(t *testing.T) {
 	}
 
 	// assert 前缀测试
-	v, err := localdb.Get([]byte("LODB-trade-order_v2-m-asset-coins.bty_token.CCNY-000000000000300001"))
+	v, err := localdb.Get([]byte("LODB-trade-order_v2-m-asset-coins.dpos_token.CCNY-000000000000300001"))
 	assert.Nil(t, err)
 	assert.Equal(t, primaryKey, string(v))
 

@@ -3,10 +3,10 @@ package testnode
 import (
 	"testing"
 
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/util"
 
-	_ "github.com/33cn/chain33/system"
-	"github.com/33cn/chain33/types"
+	_ "github.com/33cn/dplatformos/system"
+	"github.com/33cn/dplatformos/types"
 	_ "github.com/33cn/plugin/plugin"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 	"github.com/stretchr/testify/assert"

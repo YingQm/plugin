@@ -10,10 +10,10 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/33cn/chain33/p2p/utils"
+	"github.com/33cn/dplatformos/p2p/utils"
 
-	"github.com/33cn/chain33/common/merkle"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/merkle"
+	"github.com/33cn/dplatformos/types"
 )
 
 var (

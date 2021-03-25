@@ -10,20 +10,20 @@ import (
 	"sort"
 	"sync"
 
-	log "github.com/33cn/chain33/common/log/log15"
+	log "github.com/33cn/dplatformos/common/log/log15"
 
 	"sync/atomic"
 
 	"time"
 
-	"github.com/33cn/chain33/client/api"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/merkle"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/rpc/grpcclient"
-	drivers "github.com/33cn/chain33/system/consensus"
-	cty "github.com/33cn/chain33/system/dapp/coins/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/client/api"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/merkle"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/rpc/grpcclient"
+	drivers "github.com/33cn/dplatformos/system/consensus"
+	cty "github.com/33cn/dplatformos/system/dapp/coins/types"
+	"github.com/33cn/dplatformos/types"
 	paracross "github.com/33cn/plugin/plugin/dapp/paracross/types"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 )
@@ -52,7 +52,7 @@ func init() {
 
 type client struct {
 	*drivers.BaseClient
-	grpcClient      types.Chain33Client
+	grpcClient      types.DplatformOSClient
 	execAPI         api.ExecutorAPI
 	caughtUp        int32
 	commitMsgClient *commitMsgClient

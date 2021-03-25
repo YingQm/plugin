@@ -12,10 +12,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/rpc/jsonclient"
-	rpctypes "github.com/33cn/chain33/rpc/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/rpc/jsonclient"
+	rpctypes "github.com/33cn/dplatformos/rpc/types"
+	"github.com/33cn/dplatformos/types"
 	ttypes "github.com/33cn/plugin/plugin/consensus/tendermint/types"
 	vt "github.com/33cn/plugin/plugin/dapp/valnode/types"
 	"github.com/spf13/cobra"
@@ -40,7 +40,6 @@ func ValCmd() *cobra.Command {
 		IsSyncCmd(),
 		GetBlockInfoCmd(),
 		GetNodeInfoCmd(),
-		GetPerfStatCmd(),
 		AddNodeCmd(),
 		CreateCmd(),
 	)
@@ -76,7 +75,7 @@ func GetNodeInfoCmd() *cobra.Command {
 
 func getNodeInfo(cmd *cobra.Command, args []string) {
 	rpcLaddr, _ := cmd.Flags().GetString("rpc_laddr")
-	var res *vt.ValNodeInfoSet
+	var res []*vt.Validator
 	ctx := jsonclient.NewRPCCtx(rpcLaddr, "valnode.GetNodeInfo", nil, &res)
 	ctx.Run()
 }
@@ -110,42 +109,7 @@ func getBlockInfo(cmd *cobra.Command, args []string) {
 	}
 
 	var res vt.TendermintBlockInfo
-	ctx := jsonclient.NewRPCCtx(rpcLaddr, "Chain33.Query", params, &res)
-	ctx.Run()
-}
-
-// GetPerfStatCmd get block info
-func GetPerfStatCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "stat",
-		Short: "Get tendermint performance statistics",
-		Run:   getPerfStat,
-	}
-	addGetPerfStatFlags(cmd)
-	return cmd
-}
-
-func addGetPerfStatFlags(cmd *cobra.Command) {
-	cmd.Flags().Int64P("start", "s", 0, "start block height")
-	cmd.Flags().Int64P("end", "e", 0, "end block height")
-}
-
-func getPerfStat(cmd *cobra.Command, args []string) {
-	rpcLaddr, _ := cmd.Flags().GetString("rpc_laddr")
-	start, _ := cmd.Flags().GetInt64("start")
-	end, _ := cmd.Flags().GetInt64("end")
-	req := &vt.ReqPerfStat{
-		Start: start,
-		End:   end,
-	}
-	params := rpctypes.Query4Jrpc{
-		Execer:   vt.ValNodeX,
-		FuncName: "GetPerfState",
-		Payload:  types.MustPBToJSON(req),
-	}
-
-	var res vt.PerfStat
-	ctx := jsonclient.NewRPCCtx(rpcLaddr, "Chain33.Query", params, &res)
+	ctx := jsonclient.NewRPCCtx(rpcLaddr, "DplatformOS.Query", params, &res)
 	ctx.Run()
 }
 
@@ -257,7 +221,7 @@ func createFiles(cmd *cobra.Command, args []string) {
 
 	// genesis file
 	genDoc := ttypes.GenesisDoc{
-		ChainID:     fmt.Sprintf("chain33-%v", RandStr(6)),
+		ChainID:     fmt.Sprintf("dplatformos-%v", RandStr(6)),
 		GenesisTime: time.Now(),
 	}
 

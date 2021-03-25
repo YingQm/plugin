@@ -8,9 +8,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"google.golang.org/grpc/credentials"
-
-	"github.com/33cn/chain33/p2p"
+	"github.com/33cn/dplatformos/p2p"
 
 	//"strings"
 	"sync/atomic"
@@ -18,9 +16,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/33cn/chain33/common/pubsub"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/pubsub"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/types"
 	"github.com/33cn/plugin/plugin/p2p/gossip/nat"
 )
 
@@ -82,7 +80,7 @@ type Node struct {
 	cfgSeeds   sync.Map
 	closed     int32
 	pubsub     *pubsub.PubSub
-	chainCfg   *types.Chain33Config
+	chainCfg   *types.DplatformOSConfig
 	p2pMgr     *p2p.Manager
 }
 
@@ -101,7 +99,7 @@ func NewNode(mgr *p2p.Manager, mcfg *subConfig) (*Node, error) {
 		pubsub:     pubsub.NewPubSub(10200),
 		p2pMgr:     mgr,
 	}
-	node.listenPort = 13802
+	node.listenPort = 28805
 	if mcfg.Port != 0 && mcfg.Port <= 65535 && mcfg.Port > 1024 {
 		node.listenPort = int(mcfg.Port)
 
@@ -122,21 +120,10 @@ func NewNode(mgr *p2p.Manager, mcfg *subConfig) (*Node, error) {
 		node.cfgSeeds.Store(seed, "cfg")
 	}
 	node.nodeInfo = NewNodeInfo(cfg.GetModuleConfig().P2P, mcfg)
-	node.chainCfg = cfg
-	if mcfg.EnableTls { //读取证书，初始化tls客户端
-		var err error
-		node.nodeInfo.cliCreds, err = credentials.NewClientTLSFromFile(cfg.GetModuleConfig().RPC.CertFile, "")
-		if err != nil {
-			panic(err)
-		}
-		node.nodeInfo.servCreds, err = credentials.NewServerTLSFromFile(cfg.GetModuleConfig().RPC.CertFile, cfg.GetModuleConfig().RPC.KeyFile)
-		if err != nil {
-			panic(err)
-		}
-	}
 	if mcfg.ServerStart {
 		node.server = newListener(protocol, node)
 	}
+	node.chainCfg = cfg
 	return node, nil
 }
 
@@ -161,7 +148,7 @@ func (n *Node) natOk() bool {
 }
 
 func (n *Node) doNat() {
-	//测试是否在外网，当连接节点数大于0的时候，测试13802端口
+	//测试是否在外网，当连接节点数大于0的时候，测试28805端口
 	for {
 		if n.Size() > 0 {
 			break
@@ -170,7 +157,7 @@ func (n *Node) doNat() {
 	}
 	testExaddr := fmt.Sprintf("%v:%v", n.nodeInfo.GetExternalAddr().IP.String(), n.listenPort)
 	log.Info("TestNetAddr", "testExaddr", testExaddr)
-	if len(P2pComm.AddrRouteble([]string{testExaddr}, n.nodeInfo.channelVersion, n.nodeInfo.cliCreds)) != 0 {
+	if len(P2pComm.AddrRouteble([]string{testExaddr}, n.nodeInfo.channelVersion)) != 0 {
 		log.Info("node outside")
 		n.nodeInfo.SetNetSide(true)
 		if netexaddr, err := NewNetAddressString(testExaddr); err == nil {
@@ -446,7 +433,7 @@ func (n *Node) natMapPort() {
 		time.Sleep(time.Second)
 	}
 	var err error
-	if len(P2pComm.AddrRouteble([]string{n.nodeInfo.GetExternalAddr().String()}, n.nodeInfo.channelVersion, n.nodeInfo.cliCreds)) != 0 { //判断能否连通要映射的端口
+	if len(P2pComm.AddrRouteble([]string{n.nodeInfo.GetExternalAddr().String()}, n.nodeInfo.channelVersion)) != 0 { //判断能否连通要映射的端口
 		log.Info("natMapPort", "addr", "routeble")
 		p2pcli := NewNormalP2PCli() //检查要映射的IP地址是否已经被映射成功
 		ok := p2pcli.CheckSelf(n.nodeInfo.GetExternalAddr().String(), n.nodeInfo)

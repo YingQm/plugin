@@ -11,9 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"google.golang.org/grpc/credentials"
-
-	pb "github.com/33cn/chain33/types"
+	pb "github.com/33cn/dplatformos/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
@@ -143,7 +141,7 @@ func isCompressSupport(err error) bool {
 }
 
 // DialTimeout dial timeout
-func (na *NetAddress) DialTimeout(version int32, creds credentials.TransportCredentials) (*grpc.ClientConn, error) {
+func (na *NetAddress) DialTimeout(version int32) (*grpc.ClientConn, error) {
 	ch := make(chan grpc.ServiceConfig, 1)
 	ch <- P2pComm.GrpcConfig()
 
@@ -155,18 +153,11 @@ func (na *NetAddress) DialTimeout(version int32, creds credentials.TransportCred
 	timeoutOp := grpc.WithTimeout(time.Second * 3)
 	log.Debug("NetAddress", "Dial", na.String())
 	maxMsgSize := pb.MaxBlockSize + 1024*1024
-	//配置SSL连接
-	var secOpt grpc.DialOption
-	if creds == nil {
-		secOpt = grpc.WithInsecure()
-	} else {
-		secOpt = grpc.WithTransportCredentials(creds)
-	}
-	conn, err := grpc.Dial(na.String(),
+	conn, err := grpc.Dial(na.String(), grpc.WithInsecure(),
 		grpc.WithDefaultCallOptions(grpc.UseCompressor("gzip")),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMsgSize)),
 		grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(maxMsgSize)),
-		grpc.WithServiceConfig(ch), keepaliveOp, timeoutOp, secOpt)
+		grpc.WithServiceConfig(ch), keepaliveOp, timeoutOp)
 	if err != nil {
 		log.Debug("grpc DialCon", "did not connect", err, "addr", na.String())
 		return nil, err
@@ -186,7 +177,7 @@ func (na *NetAddress) DialTimeout(version int32, creds credentials.TransportCred
 		ch2 := make(chan grpc.ServiceConfig, 1)
 		ch2 <- P2pComm.GrpcConfig()
 		log.Debug("NetAddress", "Dial with unCompressor", na.String())
-		conn, err = grpc.Dial(na.String(), secOpt, grpc.WithServiceConfig(ch2), keepaliveOp, timeoutOp)
+		conn, err = grpc.Dial(na.String(), grpc.WithInsecure(), grpc.WithServiceConfig(ch2), keepaliveOp, timeoutOp)
 
 	}
 

@@ -7,19 +7,19 @@ package executor
 import (
 	"testing"
 
-	apimock "github.com/33cn/chain33/client/mocks"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/common/db/mocks"
-	"github.com/33cn/chain33/types"
+	apimock "github.com/33cn/dplatformos/client/mocks"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/common/db/mocks"
+	"github.com/33cn/dplatformos/types"
 	ty "github.com/33cn/plugin/plugin/dapp/relay/types"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 
-	_ "github.com/33cn/chain33/system"
+	_ "github.com/33cn/dplatformos/system"
 )
 
-var chainTestCfg = types.NewChain33Config(types.GetDefaultCfgstring())
+var chainTestCfg = types.NewDplatformOSConfig(types.GetDefaultCfgstring())
 
 func init() {
 	Init(ty.RelayX, chainTestCfg, nil)
@@ -139,7 +139,6 @@ func (s *suiteRelay) TestExec_1() {
 	tx.Execer = []byte(ty.RelayX)
 	tx.To = address.ExecAddress(ty.RelayX)
 	tx.Nonce = 1 //for different order id
-	tx.ChainID = chainTestCfg.GetChainID()
 	tx.Payload = types.Encode(sell)
 	tx.Sign(types.SECP256K1, privFrom)
 
@@ -490,8 +489,6 @@ func (s *suiteBtcHeader) TestSaveBtcHead_1() {
 	tx.Execer = []byte(ty.RelayX)
 	tx.To = address.ExecAddress(ty.RelayX)
 	tx.Nonce = 2 //for different order id
-	tx.ChainID = chainTestCfg.GetChainID()
-
 	tx.Payload = types.Encode(sell)
 	tx.Sign(types.SECP256K1, privFrom)
 

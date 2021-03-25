@@ -8,8 +8,8 @@ import (
 	"encoding/hex"
 	"unsafe"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/types"
 	privacy "github.com/33cn/plugin/plugin/dapp/privacy/crypto"
 	privacytypes "github.com/33cn/plugin/plugin/dapp/privacy/types"
 )
@@ -161,12 +161,12 @@ func parseViewSpendPubKeyPair(in string) (viewPubKey, spendPubKey []byte, err er
 //1.进行实际转账utxo
 //2.进行找零转账utxo
 func generateOuts(viewpubTo, spendpubto, viewpubChangeto, spendpubChangeto *[32]byte, transAmount, selectedAmount, fee int64) (*privacytypes.PrivacyOutput, error) {
-	decomDigit := decomposeAmount2digits(transAmount, privacytypes.BTYDustThreshold)
+	decomDigit := decomposeAmount2digits(transAmount, privacytypes.DPOMDustThreshold)
 	//计算找零
 	changeAmount := selectedAmount - transAmount - fee
 	var decomChange []int64
 	if 0 < changeAmount {
-		decomChange = decomposeAmount2digits(changeAmount, privacytypes.BTYDustThreshold)
+		decomChange = decomposeAmount2digits(changeAmount, privacytypes.DPOMDustThreshold)
 	}
 	bizlog.Info("generateOuts", "decompose digit for amount", selectedAmount-fee, "decomDigit", decomDigit)
 

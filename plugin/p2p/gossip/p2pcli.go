@@ -11,13 +11,13 @@ import (
 	"math/rand"
 	"net"
 
-	"github.com/33cn/chain33/p2p/utils"
+	"github.com/33cn/dplatformos/p2p/utils"
 
 	"sync/atomic"
 	"time"
 
-	"github.com/33cn/chain33/queue"
-	pb "github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/queue"
+	pb "github.com/33cn/dplatformos/types"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -561,7 +561,7 @@ func (m *Cli) GetNetInfo(msg *queue.Message, taskindex int64) {
 // CheckPeerNatOk check peer is ok or not
 func (m *Cli) CheckPeerNatOk(addr string, info *NodeInfo) bool {
 	//连接自己的地址信息做测试
-	return !(len(P2pComm.AddrRouteble([]string{addr}, info.channelVersion, info.cliCreds)) == 0)
+	return !(len(P2pComm.AddrRouteble([]string{addr}, info.channelVersion)) == 0)
 
 }
 
@@ -572,8 +572,7 @@ func (m *Cli) CheckSelf(addr string, nodeinfo *NodeInfo) bool {
 		log.Error("AddrRouteble", "NewNetAddressString", err.Error())
 		return false
 	}
-
-	conn, err := netaddr.DialTimeout(nodeinfo.channelVersion, nodeinfo.cliCreds)
+	conn, err := netaddr.DialTimeout(nodeinfo.channelVersion)
 	if err != nil {
 		return false
 	}

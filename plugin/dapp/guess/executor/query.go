@@ -7,8 +7,8 @@ package executor
 import (
 	"fmt"
 
-	"github.com/33cn/chain33/common/db/table"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/db/table"
+	"github.com/33cn/dplatformos/types"
 	gty "github.com/33cn/plugin/plugin/dapp/guess/types"
 )
 

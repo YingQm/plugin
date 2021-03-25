@@ -1,9 +1,9 @@
 package price
 
 import (
-	"github.com/33cn/chain33/queue"
-	drivers "github.com/33cn/chain33/system/mempool"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/queue"
+	drivers "github.com/33cn/dplatformos/system/mempool"
+	"github.com/33cn/dplatformos/types"
 )
 
 //--------------------------------------------------------------------------------

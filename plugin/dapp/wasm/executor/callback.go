@@ -1,9 +1,9 @@
 package executor
 
 import (
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/types"
 	types2 "github.com/33cn/plugin/plugin/dapp/wasm/types"
 )
 
@@ -169,16 +169,4 @@ func printlog(s string) {
 
 func sha256(data []byte) []byte {
 	return common.Sha256(data)
-}
-
-func getENVSize(n int) int {
-	return len(wasmCB.ENV[n])
-}
-
-func getENV(n int) string {
-	return wasmCB.ENV[n]
-}
-
-func totalENV() int {
-	return len(wasmCB.ENV)
 }

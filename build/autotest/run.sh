@@ -12,8 +12,8 @@ if [ "$(uname)" == "Darwin" ]; then
     sedfix=".bak"
 fi
 
-## get chain33 path
-CHAIN33_PATH=$(go list -f "{{.Dir}}" github.com/33cn/chain33)
+## get dplatformos path
+CHAIN33_PATH=$(go list -f "{{.Dir}}" github.com/33cn/dplatformos)
 
 function build_auto_test() {
 
@@ -26,19 +26,19 @@ function build_auto_test() {
 
 function copyAutoTestConfig() {
 
-    declare -a Chain33AutoTestDirs=("${CHAIN33_PATH}/system" "../../plugin")
+    declare -a DplatformOSAutoTestDirs=("${CHAIN33_PATH}/system" "../../plugin")
     echo "#copy auto test config to path \"$1\""
     local AutoTestConfigFile="$1/autotest.toml"
 
     #pre config auto test
     {
 
-        echo 'cliCmd="./chain33-cli"'
+        echo 'cliCmd="./dplatformos-cli"'
         echo "checkTimeout=60"
     } >"${AutoTestConfigFile}"
 
     #copy all the dapp test case config file
-    for rootDir in "${Chain33AutoTestDirs[@]}"; do
+    for rootDir in "${DplatformOSAutoTestDirs[@]}"; do
 
         if [[ ! -d ${rootDir} ]]; then
             continue
@@ -69,11 +69,11 @@ function copyAutoTestConfig() {
     done
 }
 
-function copyChain33() {
+function copyDplatformOS() {
 
-    echo "# copy chain33 bin to path \"$1\", make sure build chain33"
-    cp ../chain33 ../chain33-cli ../chain33.toml "$1"
-    cp "${CHAIN33_PATH}"/cmd/chain33/chain33.test.toml "$1"
+    echo "# copy dplatformos bin to path \"$1\", make sure build dplatformos"
+    cp ../dplatformos ../dplatformos-cli ../dplatformos.toml "$1"
+    cp "${CHAIN33_PATH}"/cmd/dplatformos/dplatformos.test.toml "$1"
 }
 
 function copyAll() {
@@ -85,7 +85,7 @@ function copyAll() {
     fi
     cp autotest "${dir}"
     copyAutoTestConfig "${dir}"
-    copyChain33 "${dir}"
+    copyDplatformOS "${dir}"
     echo "# all copy have done!"
 }
 

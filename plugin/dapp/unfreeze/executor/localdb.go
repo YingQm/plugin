@@ -5,9 +5,9 @@
 package executor
 
 import (
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/common/db/table"
-	"github.com/33cn/chain33/types"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/common/db/table"
+	"github.com/33cn/dplatformos/types"
 	pty "github.com/33cn/plugin/plugin/dapp/unfreeze/types"
 )
 

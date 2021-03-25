@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/merkle"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/merkle"
+	"github.com/33cn/dplatformos/types"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 )
 
@@ -165,7 +165,7 @@ func (client *blockSyncClient) batchSyncBlocks() {
 		}
 		//没有需要同步的块,清理本地数据库中localCacheCount前的块
 		if err == nil && curSyncCaughtState {
-			err := client.clearLocalOldBlocks()
+			_, err := client.clearLocalOldBlocks()
 			if err != nil {
 				client.printError(err)
 			}
@@ -289,8 +289,6 @@ func (client *blockSyncClient) delLocalBlocks(startHeight int64, endHeight int64
 		return errors.New("para sync - startHeight > endHeight,can't clear local blocks")
 	}
 
-	plog.Info("Para sync - clear local blocks", "startHeight:", startHeight, "endHeight:", endHeight)
-
 	index := startHeight
 	set := &types.LocalDBSet{}
 	cfg := client.paraClient.GetAPI().GetConfig()
@@ -309,6 +307,8 @@ func (client *blockSyncClient) delLocalBlocks(startHeight int64, endHeight int64
 	key := calcTitleFirstHeightKey(cfg.GetTitle())
 	kv := &types.KeyValue{Key: key, Value: types.Encode(&types.Int64{Data: endHeight + 1})}
 	set.KV = append(set.KV, kv)
+
+	client.printDebugInfo("Para sync - clear local blocks", "startHeight:", startHeight, "endHeight:", endHeight)
 
 	return client.paraClient.setLocalDb(set)
 }
@@ -356,28 +356,23 @@ func (client *blockSyncClient) getFirstLocalHeight() (int64, error) {
 }
 
 //清除指定数量(localCacheCount)以前的区块
-func (client *blockSyncClient) clearLocalOldBlocks() error {
+func (client *blockSyncClient) clearLocalOldBlocks() (bool, error) {
 	lastLocalHeight, err := client.paraClient.getLastLocalHeight()
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	firstLocalHeight, err := client.getFirstLocalHeight()
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	canDelCount := lastLocalHeight - firstLocalHeight - client.maxCacheCount + 1
-	count := canDelCount / client.maxCacheCount
-	for i := int64(0); i < count; i++ {
-		start := firstLocalHeight + i*client.maxCacheCount
-		end := start + client.maxCacheCount - 1
-		err = client.delLocalBlocks(start, end)
-		if err != nil {
-			return err
-		}
+	if canDelCount <= client.maxCacheCount {
+		return false, nil
 	}
-	return nil
+
+	return true, client.delLocalBlocks(firstLocalHeight, firstLocalHeight+canDelCount-1)
 }
 
 // miner tx need all para node create, but not all node has auth account, here just not sign to keep align

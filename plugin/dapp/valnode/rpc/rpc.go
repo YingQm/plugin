@@ -7,7 +7,7 @@ package rpc
 import (
 	"context"
 
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 	vt "github.com/33cn/plugin/plugin/dapp/valnode/types"
 )
 
@@ -34,12 +34,12 @@ func (c *Jrpc) IsSync(req *types.ReqNil, result *interface{}) error {
 }
 
 // GetNodeInfo query node info
-func (c *channelClient) GetNodeInfo(ctx context.Context, req *types.ReqNil) (*vt.ValNodeInfoSet, error) {
+func (c *channelClient) GetNodeInfo(ctx context.Context, req *types.ReqNil) (*vt.ValidatorSet, error) {
 	data, err := c.QueryConsensusFunc("tendermint", "NodeInfo", &types.ReqNil{})
 	if err != nil {
 		return nil, err
 	}
-	if resp, ok := data.(*vt.ValNodeInfoSet); ok {
+	if resp, ok := data.(*vt.ValidatorSet); ok {
 		return resp, nil
 	}
 	return nil, types.ErrDecode
@@ -51,6 +51,6 @@ func (c *Jrpc) GetNodeInfo(req *types.ReqNil, result *interface{}) error {
 	if err != nil {
 		return err
 	}
-	*result = data
+	*result = data.Validators
 	return nil
 }

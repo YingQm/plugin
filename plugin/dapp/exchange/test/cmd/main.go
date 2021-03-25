@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 	"github.com/33cn/plugin/plugin/dapp/exchange/test"
 	et "github.com/33cn/plugin/plugin/dapp/exchange/types"
 )
@@ -17,7 +17,7 @@ var (
 
 // 批量测试前，先确保测试账户有足够的币和钱
 func main() {
-	cli = test.NewGRPCCli("localhost:8802")
+	cli = test.NewGRPCCli("localhost:28804")
 	go buy()
 	go sell()
 	select {}
@@ -25,14 +25,14 @@ func main() {
 
 func sell() {
 	req := &et.LimitOrder{
-		LeftAsset:  &et.Asset{Symbol: "bty", Execer: "coins"},
+		LeftAsset:  &et.Asset{Symbol: "dpos", Execer: "coins"},
 		RightAsset: &et.Asset{Execer: "token", Symbol: "CCNY"},
 		Price:      1,
 		Amount:     types.Coin,
 		Op:         et.OpSell,
 	}
 	ety := types.LoadExecutorType(et.ExchangeX)
-	// 卖 2000 次，需 2000*1=2000 个 bty
+	// 卖 2000 次，需 2000*1=2000 个 dpos
 	for i := 0; i < 2000; i++ {
 		fmt.Println("sell ", i)
 		tx, err := ety.Create("LimitOrder", req)
@@ -45,7 +45,7 @@ func sell() {
 
 func buy() {
 	req := &et.LimitOrder{
-		LeftAsset:  &et.Asset{Symbol: "bty", Execer: "coins"},
+		LeftAsset:  &et.Asset{Symbol: "dpos", Execer: "coins"},
 		RightAsset: &et.Asset{Execer: "token", Symbol: "CCNY"},
 		Price:      1,
 		Amount:     types.Coin,

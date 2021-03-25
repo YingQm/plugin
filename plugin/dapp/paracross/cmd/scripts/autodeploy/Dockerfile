@@ -1,10 +1,10 @@
 FROM ubuntu:16.04
 
 WORKDIR /root
-COPY chain33 chain33
-COPY chain33-cli chain33-cli
+COPY dplatformos dplatformos
+COPY dplatformos-cli dplatformos-cli
 COPY entrypoint.sh entrypoint.sh
-COPY chain33.toml chain33*.toml ./
+COPY dplatformos.toml dplatformos*.toml ./
 
 
-CMD ["/root/chain33", "-f", "/root/chain33.toml"]
+CMD ["/root/dplatformos", "-f", "/root/dplatformos.toml"]

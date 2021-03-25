@@ -1,8 +1,6 @@
 package gossip
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -11,23 +9,21 @@ import (
 	"sync/atomic"
 	"time"
 
-	"google.golang.org/grpc/credentials"
+	"github.com/33cn/dplatformos/p2p"
 
-	"github.com/33cn/chain33/p2p"
-
-	"github.com/33cn/chain33/p2p/utils"
+	"github.com/33cn/dplatformos/p2p/utils"
 
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/33cn/chain33/client"
+	"github.com/33cn/dplatformos/client"
 
-	l "github.com/33cn/chain33/common/log"
+	l "github.com/33cn/dplatformos/common/log"
 
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/wallet"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/wallet"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
@@ -125,7 +121,7 @@ func processMsg(q queue.Queue) {
 }
 
 //new p2p
-func newP2p(cfg *types.Chain33Config, port int32, dbpath string, q queue.Queue) *P2p {
+func newP2p(cfg *types.DplatformOSConfig, port int32, dbpath string, q queue.Queue) *P2p {
 	p2pCfg := cfg.GetModuleConfig().P2P
 	p2pCfg.Enable = true
 	p2pCfg.DbPath = dbpath
@@ -185,7 +181,7 @@ func testNetInfo(t *testing.T, p2p *P2p) {
 
 //测试Peer
 func testPeer(t *testing.T, p2p *P2p, q queue.Queue) {
-	cfg := types.NewChain33Config(types.ReadFile("../../../chain33.toml"))
+	cfg := types.NewDplatformOSConfig(types.ReadFile("../../../dplatformos.toml"))
 	conn, err := grpc.Dial("localhost:53802", grpc.WithInsecure(),
 		grpc.WithDefaultCallOptions(grpc.UseCompressor("gzip")))
 	assert.Nil(t, err)
@@ -265,7 +261,7 @@ func testPeer(t *testing.T, p2p *P2p, q queue.Queue) {
 
 	_, err = p2pcli.SendVersion(peer, localP2P.node.nodeInfo)
 	assert.Nil(t, err)
-	t.Log("nodeinfo", localP2P.node.nodeInfo)
+
 	t.Log(p2pcli.CheckPeerNatOk("localhost:53802", localP2P.node.nodeInfo))
 	t.Log("checkself:", p2pcli.CheckSelf("loadhost:43803", localP2P.node.nodeInfo))
 	_, err = p2pcli.GetAddr(peer)
@@ -368,7 +364,7 @@ func testGrpcStreamConns(t *testing.T, p2p *P2p) {
 
 func testP2pComm(t *testing.T, p2p *P2p) {
 
-	addrs := P2pComm.AddrRouteble([]string{"localhost:53802"}, utils.CalcChannelVersion(testChannel, VERSION), nil)
+	addrs := P2pComm.AddrRouteble([]string{"localhost:53802"}, utils.CalcChannelVersion(testChannel, VERSION))
 	t.Log(addrs)
 	i32 := P2pComm.BytesToInt32([]byte{0xff})
 	t.Log(i32)
@@ -435,7 +431,7 @@ func testRestart(t *testing.T, p2p *P2p) {
 }
 
 func Test_p2p(t *testing.T) {
-	cfg := types.NewChain33Config(types.ReadFile("../../../chain33.toml"))
+	cfg := types.NewDplatformOSConfig(types.ReadFile("../../../dplatformos.toml"))
 	q := queue.New("channel")
 	q.SetConfig(cfg)
 	go q.Start()
@@ -497,87 +493,4 @@ func TestSortArr(t *testing.T) {
 		Inventorys = append(Inventorys, &inv)
 	}
 	sort.Sort(Inventorys)
-}
-
-func TestCreds(t *testing.T) {
-	cert := `-----BEGIN CERTIFICATE-----
-MIIDdTCCAl2gAwIBAgIJAJ1Z/S9L51/5MA0GCSqGSIb3DQEBCwUAMFExCzAJBgNV
-BAYTAkNOMQswCQYDVQQIDAJaSjELMAkGA1UEBwwCSFoxDDAKBgNVBAoMA0ZaTTEM
-MAoGA1UECwwDRlpNMQwwCgYDVQQDDANMQlowHhcNMTgwNjI5MDMxNzEzWhcNMjgw
-NjI2MDMxNzEzWjBRMQswCQYDVQQGEwJDTjELMAkGA1UECAwCWkoxCzAJBgNVBAcM
-AkhaMQwwCgYDVQQKDANGWk0xDDAKBgNVBAsMA0ZaTTEMMAoGA1UEAwwDTEJaMIIB
-IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2OkNfozvtf5td2qgnDya9q+c
-R+wjD69ZuWe3DkPeOI2H/wRqyeasCj51qDDd6kQEVoyVfVtNMQgMQUxvHxSt1QU9
-rMp4zsm/aJaoeiYhJJH7l/FXLL4hYQ7LUSr2ee4at8fV9CCRh33DMpQ+50xGiWLt
-IfRtzAqiKV7P6RO+jz3iCtedWLb71lGUfAQ89NlOJT6b0819hMd5wZpvrc1ZXfdm
-copIHq6FsjwocoZ6cm2tY3L3NSk2WA8QY5Zej51aphAv6ZvhUBS0FEwPGX95AQpw
-T209Gy/GW965dp6oR7LLLgXfWiCST49NH3Q6gP6j1r3KxTEk2g9aBhs9QQOksQID
-AQABo1AwTjAdBgNVHQ4EFgQUiW78+xheZX7bdjFjCibo+3q2ZxMwHwYDVR0jBBgw
-FoAUiW78+xheZX7bdjFjCibo+3q2ZxMwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0B
-AQsFAAOCAQEAYkDwYepsJ734ytpfZY3D9HxR6fM2XdM0o35kQu1+lb2Ik+7oJKvT
-SprSkL+l+1B3dYa4rLS8dztngR57js3BI6qgXavl3EeLf1gRSpAGul1uf+jkupOK
-BgQ76TIlY88crbQw6Fkgrf9X9kfCbEDwoRZuX3aIWVpQtb+hkMoNI4wa8beWGWZK
-EVaSxR1/QJIZIVxi5xcUQW2qdR/T4KvG3QVVcxJm2nZg2jexc5XopPNRLUfWZeXy
-u8/Svlv5uH+2EqDGtYiDqmWlyGFJ3Q6lOGwCqRvhty7SYaHDZpV+10M32UuMBOOz
-aHJJceqATq0U4NdzjbR0ygkApyDfv/5yfw==
------END CERTIFICATE-----
-`
-	key := `-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEA2OkNfozvtf5td2qgnDya9q+cR+wjD69ZuWe3DkPeOI2H/wRq
-yeasCj51qDDd6kQEVoyVfVtNMQgMQUxvHxSt1QU9rMp4zsm/aJaoeiYhJJH7l/FX
-LL4hYQ7LUSr2ee4at8fV9CCRh33DMpQ+50xGiWLtIfRtzAqiKV7P6RO+jz3iCted
-WLb71lGUfAQ89NlOJT6b0819hMd5wZpvrc1ZXfdmcopIHq6FsjwocoZ6cm2tY3L3
-NSk2WA8QY5Zej51aphAv6ZvhUBS0FEwPGX95AQpwT209Gy/GW965dp6oR7LLLgXf
-WiCST49NH3Q6gP6j1r3KxTEk2g9aBhs9QQOksQIDAQABAoIBAFgMilDDjw62X+Mo
-olepdlIKyQqc/UKBsI9FXZZp0Evuj7TiKyMYAuAJqKMEayCMSaKEYK5JIJV1qdvb
-1gOs1j9xaC665b0zQgKHnY4v6iY5KALuka904oHOipPBN9oY4DmX4e6+RbTVRSZD
-7SDg4oUkZhPxb5xy+I6IkScQv7rO6aGiC7Z55K1X75/S3ga8mK2KaEKHat3mHDTo
-h32D4jt9u0KzctXsUc6zpBE8gODZJ1DBN64TsX+6ZEov123PBounNanxxkn362cv
-BIhD9iblOdWShxhNew1o7wCaD6ID24a/Y/dqSLWjWvYdAvs8s1KYijrlSVw6psBW
-18esx9ECgYEA7NFUXVU9KQ8oY1wq8+vC41HYiXXpnU3xNOm2+qPIz2rSU35OUovp
-icd706fhcoewQJ/cu25QWOwqHpCQl5Yo++cDSHtnRyMBlE6Z7NbxTFhfUzYV5UxW
-fFcQGzZ17I93QoYleWaR66DeJOCnBKgePzNpTSjq69MN6HySwsL8Kq0CgYEA6nrs
-VGFhcmbPTdKK7UZNjY3EG//+BITGEBSS0ouPAZudVbHggck+Xu/slHLgrEsQy/cJ
-KBDpXN+rXE577BWATJdAjCe0DmoaArW6Lm4pdNUh7l8r79y9I3Xn85T+oWji65Vw
-kolYlokpa1xuViYr3FhPhuH/VmRH8Q0mg/TRxpUCgYBifF/AfO11gOdEAxWd4WNo
-VCZgbFgeYka4waWmMK0XjY4wyOtbqvIRqZNWn4/DqKhlB9atYCAsCvMtSOPJFtqu
-gBE+eIun6ugCPHoJJA6vuGTUXz7V4FxrU23QU2LRYYywbsdw6HYw7vLTlVYAOsZx
-dDkLrMOeFWTIVd5W/u4N9QKBgF5+eT0sHWRIMGTxY1Fp0pkoN479JDZX96XFVMIK
-we/o8Yf2bj5/hmYmFFZi0U491iAMhyEhZ5oo/VruuhwTMigrkDSrT3G7qo3LBKPv
-ez99IPZ6Xi+E6qgevQI52j/cEA7Wo446UXwg/JMqpcCME4LyB+KYsxjywtdO8GWf
-RObdAoGBALP9HK7KuX7xl0cKBzOiXqnAyoMUfxvO30CsMI3DS0SrPc1p95OHswdu
-/q1W3bMgctjEkgFljjDxDcdyYrPA2ZdXdY1An8nqZ9C48Hyvnj60Gfb3b6ycyZcb
-/gd2v1Fb6oM82QBmWOFWaRSZj0UHZf8GvT09bs/SCSW4/hY/m4uC
------END RSA PRIVATE KEY-----`
-
-	certificate, err := tls.X509KeyPair([]byte(cert), []byte(key))
-	assert.Nil(t, err)
-	cp := x509.NewCertPool()
-	if !cp.AppendCertsFromPEM([]byte(cert)) {
-		return
-	}
-	var node Node
-	node.nodeInfo = &NodeInfo{}
-	servCreds := credentials.NewServerTLSFromCert(&certificate)
-	cliCreds := credentials.NewClientTLSFromCert(cp, "")
-
-	node.listenPort = 3331
-	node.nodeInfo.servCreds = servCreds
-	newListener("tcp", &node)
-	netAddr, err := NewNetAddressString("localhost:3331")
-	assert.Nil(t, err)
-
-	conn, err := grpc.Dial(netAddr.String(), grpc.WithTransportCredentials(cliCreds))
-	assert.Nil(t, err)
-	assert.NotNil(t, conn)
-	conn.Close()
-
-	conn, err = grpc.Dial(netAddr.String())
-	assert.NotNil(t, err)
-	t.Log("without creds", err)
-	assert.Nil(t, conn)
-	conn, err = grpc.Dial(netAddr.String(), grpc.WithInsecure())
-	assert.Nil(t, err)
-	assert.NotNil(t, conn)
-
 }

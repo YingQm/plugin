@@ -15,12 +15,12 @@ import (
 	"fmt"
 	"path/filepath"
 
-	log "github.com/33cn/chain33/common/log/log15"
+	log "github.com/33cn/dplatformos/common/log/log15"
 	"github.com/33cn/plugin/plugin/dapp/cert/authority/tools/cryptogen/factory/utils"
 	auth "github.com/33cn/plugin/plugin/dapp/cert/authority/utils"
 )
 
-var logger = log.New("module", "tools")
+var logger = log.New("tools", "cryptogen")
 
 // NewFileBasedKeyStore 创建key存储器
 func NewFileBasedKeyStore(pwd []byte, path string, readOnly bool) (KeyStore, error) {
@@ -65,7 +65,6 @@ func (ks *fileBasedKeyStore) Init(pwd []byte, path string, readOnly bool) error 
 	}
 
 	ks.readOnly = readOnly
-	logger.Info("generate keystore file", "path", path)
 
 	return nil
 }
@@ -86,7 +85,7 @@ func (ks *fileBasedKeyStore) StoreKey(k Key) (err error) {
 	case *ecdsaPrivateKey:
 		kk := k.(*ecdsaPrivateKey)
 
-		err = ks.storePrivateKeyByte(hex.EncodeToString(k.SKI()), kk.privKey)
+		err = ks.storePrivateKey(hex.EncodeToString(k.SKI()), kk.privKey)
 		if err != nil {
 			return fmt.Errorf("Failed storing ECDSA private key [%s]", err)
 		}
@@ -101,7 +100,7 @@ func (ks *fileBasedKeyStore) StoreKey(k Key) (err error) {
 	case *SM2PrivateKey:
 		kk := k.(*SM2PrivateKey)
 
-		err = ks.storePrivateKeyByte(hex.EncodeToString(k.SKI()), kk.PrivKey)
+		err = ks.storePrivateKey(hex.EncodeToString(k.SKI()), kk.PrivKey)
 		if err != nil {
 			return fmt.Errorf("Failed storing SM2 private key [%s]", err)
 		}
@@ -120,32 +119,16 @@ func (ks *fileBasedKeyStore) StoreKey(k Key) (err error) {
 	return
 }
 
-func (ks *fileBasedKeyStore) storePrivateKeyByte(alias string, privateKey interface{}) error {
-	rawKey, err := utils.PrivateKeyToByte(privateKey)
-	if err != nil {
-		logger.Error("Failed converting private key to PEM", "name", alias, "error", err)
-		return err
-	}
-
-	err = ioutil.WriteFile(ks.getPathForAlias(alias, "sk"), rawKey, 0700)
-	if err != nil {
-		logger.Error("Failed storing private key", "name", alias, "error", err)
-		return err
-	}
-
-	return nil
-}
-
 func (ks *fileBasedKeyStore) storePrivateKey(alias string, privateKey interface{}) error {
 	rawKey, err := utils.PrivateKeyToPEM(privateKey, ks.pwd)
 	if err != nil {
-		logger.Error("Failed converting private key to PEM", "name", alias, "error", err)
+		logger.Error("Failed converting private key to PEM [%s]: [%s]", alias, err)
 		return err
 	}
 
 	err = ioutil.WriteFile(ks.getPathForAlias(alias, "sk"), rawKey, 0700)
 	if err != nil {
-		logger.Error("Failed storing private key", "name", alias, "error", err)
+		logger.Error("Failed storing private key [%s]: [%s]", alias, err)
 		return err
 	}
 
@@ -155,13 +138,13 @@ func (ks *fileBasedKeyStore) storePrivateKey(alias string, privateKey interface{
 func (ks *fileBasedKeyStore) storePublicKey(alias string, publicKey interface{}) error {
 	rawKey, err := utils.PublicKeyToPEM(publicKey, ks.pwd)
 	if err != nil {
-		logger.Error("Failed converting public key to PEM", "name", alias, "error", err)
+		logger.Error("Failed converting public key to PEM [%s]: [%s]", alias, err)
 		return err
 	}
 
 	err = ioutil.WriteFile(ks.getPathForAlias(alias, "pk"), rawKey, 0700)
 	if err != nil {
-		logger.Error("Failed storing public key", "name", alias, "error", err)
+		logger.Error("Failed storing private key [%s]: [%s]", alias, err)
 		return err
 	}
 
@@ -174,7 +157,7 @@ func (ks *fileBasedKeyStore) createKeyStoreIfNotExists() error {
 	if missing {
 		err := ks.createKeyStore()
 		if err != nil {
-			logger.Error("Failed creating KeyStore At", "path", ksPath, "error", err.Error())
+			logger.Error("Failed creating KeyStore At [%s]: [%s]", ksPath, err.Error())
 			return err
 		}
 	}

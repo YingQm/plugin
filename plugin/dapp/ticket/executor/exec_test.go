@@ -7,12 +7,12 @@ package executor_test
 import (
 	"testing"
 
-	apimock "github.com/33cn/chain33/client/mocks"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	apimock "github.com/33cn/dplatformos/client/mocks"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -45,11 +45,11 @@ var (
 		[]byte("1NLHPEcbTWWxxU3dGUZBhayjrCHD3psX7k"),
 		[]byte("1MCftFynyvG2F4ED5mdHYgziDxx6vDrScs"),
 	}
-	//chain33TestCfg = types.NewChain33Config(strings.Replace(types.GetDefaultCfgstring(), "Title=\"local\"", "Title=\"chain33\"", 1))
+	//dplatformosTestCfg = types.NewDplatformOSConfig(strings.Replace(types.GetDefaultCfgstring(), "Title=\"local\"", "Title=\"dplatformos\"", 1))
 )
 
 func Test_Exec_Bind_Unbind(t *testing.T) {
-	chain33TestCfg := mock33.GetAPI().GetConfig()
+	dplatformosTestCfg := mock33.GetAPI().GetConfig()
 	env := execEnv{
 		1539918074,
 		10000,
@@ -60,7 +60,7 @@ func Test_Exec_Bind_Unbind(t *testing.T) {
 
 	_, ldb, kvdb := util.CreateTestDB()
 	api := new(apimock.QueueProtocolAPI)
-	api.On("GetConfig", mock.Anything).Return(chain33TestCfg, nil)
+	api.On("GetConfig", mock.Anything).Return(dplatformosTestCfg, nil)
 	driver, err := dapp.LoadDriver("ticket", 1000)
 	assert.Nil(t, err)
 	driver.SetAPI(api)
@@ -71,7 +71,7 @@ func Test_Exec_Bind_Unbind(t *testing.T) {
 	priv, err := FromPrivkey(PrivKeyA)
 	assert.Nil(t, err)
 
-	bindTx := createBindMiner(t, chain33TestCfg, string(Nodes[1]), string(Nodes[0]), priv)
+	bindTx := createBindMiner(t, dplatformosTestCfg, string(Nodes[1]), string(Nodes[0]), priv)
 	receipt, err := driver.Exec(bindTx, env.index)
 	if err != nil {
 		assert.Nil(t, err, "exec failed")
@@ -85,7 +85,7 @@ func Test_Exec_Bind_Unbind(t *testing.T) {
 	assert.Equal(t, string(Nodes[1]), bindInfo.MinerAddress)
 	assert.Equal(t, string(Nodes[0]), bindInfo.ReturnAddress)
 
-	unbindTx := createBindMiner(t, chain33TestCfg, "", string(Nodes[0]), priv)
+	unbindTx := createBindMiner(t, dplatformosTestCfg, "", string(Nodes[0]), priv)
 	receipt, err = driver.Exec(unbindTx, env.index)
 	if err != nil {
 		assert.Nil(t, err, "exec failed")

@@ -15,10 +15,10 @@ import (
 
 	"strings"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/types"
 	pty "github.com/33cn/plugin/plugin/dapp/token/types"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -30,10 +30,10 @@ var (
 )
 
 var (
-	mainNetgrpcAddr = "localhost:8802"
+	mainNetgrpcAddr = "localhost:28804"
 	ParaNetgrpcAddr = "localhost:8902"
-	mainClient      types.Chain33Client
-	paraClient      types.Chain33Client
+	mainClient      types.DplatformOSClient
+	paraClient      types.DplatformOSClient
 	r               *rand.Rand
 
 	ErrTest = errors.New("ErrTest")
@@ -83,13 +83,13 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	mainClient = types.NewChain33Client(conn)
+	mainClient = types.NewDplatformOSClient(conn)
 
 	conn, err = grpc.Dial(ParaNetgrpcAddr, grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
-	paraClient = types.NewChain33Client(conn)
+	paraClient = types.NewDplatformOSClient(conn)
 
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 	addrexec = address.ExecAddress("user.p.guodun.token")
@@ -164,14 +164,12 @@ func TestPrecreate(t *testing.T) {
 		Ty:    pty.TokenActionPreCreate,
 		Value: &pty.TokenAction_TokenPreCreate{TokenPreCreate: v},
 	}
-	version, _ := mainClient.Version(context.Background(), nil)
 	tx := &types.Transaction{
 		Execer:  []byte(execName),
 		Payload: types.Encode(precreate),
 		Fee:     feeForToken,
 		Nonce:   r.Int63(),
 		To:      address.ExecAddress(execName),
-		ChainID: version.GetChainID(),
 	}
 	tx.Sign(types.SECP256K1, privkey)
 
@@ -207,15 +205,12 @@ func TestFinish(t *testing.T) {
 		Ty:    pty.TokenActionFinishCreate,
 		Value: &pty.TokenAction_TokenFinishCreate{TokenFinishCreate: v},
 	}
-	version, _ := mainClient.Version(context.Background(), nil)
-
 	tx := &types.Transaction{
 		Execer:  []byte(execName),
 		Payload: types.Encode(finish),
 		Fee:     feeForToken,
 		Nonce:   r.Int63(),
 		To:      address.ExecAddress(execName),
-		ChainID: version.GetChainID(),
 	}
 	tx.Sign(types.SECP256K1, privkey)
 
@@ -251,9 +246,6 @@ func TestTransferToken(t *testing.T) {
 
 	tx := &types.Transaction{Execer: []byte(execName), Payload: types.Encode(transfer), Fee: fee, To: addrexec}
 	tx.Nonce = r.Int63()
-
-	version, _ := mainClient.Version(context.Background(), nil)
-	tx.ChainID = version.GetChainID()
 	tx.Sign(types.SECP256K1, privkey)
 
 	reply, err := mainClient.SendTransaction(context.Background(), tx)
@@ -334,10 +326,6 @@ func TestTokenMint(t *testing.T) {
 
 	tx := &types.Transaction{Execer: []byte(execName), Payload: types.Encode(transfer), Fee: fee, To: addrexec}
 	tx.Nonce = r.Int63()
-
-	version, _ := mainClient.Version(context.Background(), nil)
-	tx.ChainID = version.GetChainID()
-
 	tx.Sign(types.SECP256K1, privkey)
 
 	reply, err := mainClient.SendTransaction(context.Background(), tx)
@@ -436,7 +424,7 @@ func getprivkey(key string) crypto.PrivKey {
 }
 
 func TestToken_validSymbolWithHeight(t *testing.T) {
-	cfg := types.NewChain33Config(strings.Replace(types.GetDefaultCfgstring(), "Title=\"local\"", "Title=\"chain33\"", 1))
+	cfg := types.NewDplatformOSConfig(strings.Replace(types.GetDefaultCfgstring(), "Title=\"local\"", "Title=\"dplatformos\"", 1))
 	forkBadTokenSymbol := cfg.GetDappFork(pty.TokenX, pty.ForkBadTokenSymbolX)
 	forkTokenSymbolWithNumber := cfg.GetDappFork(pty.TokenX, pty.ForkTokenSymbolWithNumberX)
 	t.Log("x", "1", forkBadTokenSymbol, "2", forkTokenSymbolWithNumber)

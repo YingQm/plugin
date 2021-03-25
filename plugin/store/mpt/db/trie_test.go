@@ -35,10 +35,10 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/33cn/chain33/common"
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/common/log"
-	comTy "github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/common/log"
+	comTy "github.com/33cn/dplatformos/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

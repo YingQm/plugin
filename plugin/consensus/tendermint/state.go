@@ -12,10 +12,10 @@ import (
 	"io/ioutil"
 	"sync"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/types"
 	ttypes "github.com/33cn/plugin/plugin/consensus/tendermint/types"
 	tmtypes "github.com/33cn/plugin/plugin/dapp/valnode/types"
 )
@@ -440,7 +440,6 @@ func LoadProposer(source *tmtypes.Validator) (*ttypes.Validator, error) {
 
 // CreateBlockInfoTx make blockInfo to the first transaction of the block and execer is valnode
 func CreateBlockInfoTx(pubkey string, state *tmtypes.State, block *tmtypes.TendermintBlock) *types.Transaction {
-
 	blockSave := *block
 	blockSave.Data = nil
 	blockInfo := &tmtypes.TendermintBlockInfo{

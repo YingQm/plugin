@@ -5,9 +5,9 @@
 package executor
 
 import (
-	log "github.com/33cn/chain33/common/log/log15"
-	drivers "github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	drivers "github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
 	"github.com/33cn/plugin/plugin/dapp/cert/authority"
 	ct "github.com/33cn/plugin/plugin/dapp/cert/types"
 )
@@ -16,7 +16,7 @@ var clog = log.New("module", "execs.cert")
 var driverName = ct.CertX
 
 // Init 初始化
-func Init(name string, cfg *types.Chain33Config, sub []byte) {
+func Init(name string, cfg *types.DplatformOSConfig, sub []byte) {
 	driverName = name
 	var scfg ct.Authority
 	if sub != nil {
@@ -24,7 +24,7 @@ func Init(name string, cfg *types.Chain33Config, sub []byte) {
 	}
 	err := authority.Author.Init(&scfg)
 	if err != nil {
-		clog.Error("error to initialize authority", "error", err)
+		clog.Error("error to initialize authority", err)
 		return
 	}
 	drivers.Register(cfg, driverName, newCert, cfg.GetDappFork(driverName, "Enable"))

@@ -19,7 +19,6 @@ message wasmCall {
   string contract = 1;
   string method = 2;
   repeated int64 parameters = 3;
-  repeated string env = 4;
 }
 
 message queryCheckContract {
@@ -38,7 +37,7 @@ message createContractLog {
 message callContractLog {
   string contract = 1;
   string method = 2;
-  int32 result = 3;
+  int64 result = 3;
 }
 
 message localDataLog {

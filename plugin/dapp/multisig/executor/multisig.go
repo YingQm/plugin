@@ -18,13 +18,13 @@ import (
 	"bytes"
 	"encoding/hex"
 
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/client"
-	"github.com/33cn/chain33/common/address"
-	log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/system/dapp"
-	drivers "github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/client"
+	"github.com/33cn/dplatformos/common/address"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/system/dapp"
+	drivers "github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
 	mty "github.com/33cn/plugin/plugin/dapp/multisig/types"
 )
 
@@ -33,7 +33,7 @@ var multisiglog = log.New("module", "execs.multisig")
 var driverName = "multisig"
 
 // Init multisig模块初始化
-func Init(name string, cfg *types.Chain33Config, sub []byte) {
+func Init(name string, cfg *types.DplatformOSConfig, sub []byte) {
 	drivers.Register(cfg, GetName(), newMultiSig, cfg.GetDappFork(driverName, "Enable"))
 	InitExecType()
 }
@@ -1037,10 +1037,10 @@ func getMultiSigTxPayload(tx *types.TransactionDetail) (*mty.MultiSigAction, err
 	return &payload, nil
 }
 
-//bty 显示是大写，在底层mavl数据库中对应key值时使用小写
+//dpos 显示是大写，在底层mavl数据库中对应key值时使用小写
 func getRealSymbol(symbol string) string {
-	if symbol == types.BTY {
-		return "bty"
+	if symbol == types.DPOM {
+		return "dpos"
 	}
 	return symbol
 }

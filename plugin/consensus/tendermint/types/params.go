@@ -9,7 +9,7 @@ import (
 
 	"encoding/json"
 
-	"github.com/33cn/chain33/common/crypto"
+	"github.com/33cn/dplatformos/common/crypto"
 )
 
 const (

@@ -3,9 +3,9 @@ package executor
 import (
 	"encoding/hex"
 
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
 	types2 "github.com/33cn/plugin/plugin/dapp/wasm/types"
 	"github.com/perlin-network/life/compiler"
 	"github.com/perlin-network/life/exec"
@@ -74,6 +74,7 @@ func (w *Wasm) Exec_Create(payload *types2.WasmCreate, tx *types.Transaction, in
 }
 
 func (w *Wasm) Exec_Call(payload *types2.WasmCall, tx *types.Transaction, index int) (*types.Receipt, error) {
+	log.Info("into wasm Exec_Call...")
 	if payload == nil {
 		return nil, types.ErrInvalidParam
 	}
@@ -82,26 +83,18 @@ func (w *Wasm) Exec_Call(payload *types2.WasmCall, tx *types.Transaction, index 
 	}
 
 	w.stateKVC = dapp.NewKVCreator(w.GetStateDB(), calcStatePrefix(payload.Contract), nil)
-	var vm *exec.VirtualMachine
-	var ok bool
-	if vm, ok = w.VMCache[payload.Contract]; !ok {
-		code, err := w.stateKVC.GetNoPrefix(contractKey(payload.Contract))
-		if err != nil {
-			return nil, err
-		}
-		vm, err = exec.NewVirtualMachine(code, exec.VMConfig{
-			DefaultMemoryPages:   128,
-			DefaultTableSize:     128,
-			DisableFloatingPoint: true,
-			GasLimit:             uint64(tx.Fee),
-		}, new(Resolver), &compiler.SimpleGasPolicy{GasPerInstruction: 1})
-		if err != nil {
-			return nil, err
-		}
-		w.VMCache[payload.Contract] = vm
-	} else {
-		vm.Config.GasLimit = uint64(tx.Fee)
-		vm.Gas = 0
+	code, err := w.stateKVC.GetNoPrefix(contractKey(payload.Contract))
+	if err != nil {
+		return nil, err
+	}
+	vm, err := exec.NewVirtualMachine(code, exec.VMConfig{
+		DefaultMemoryPages:   128,
+		DefaultTableSize:     128,
+		DisableFloatingPoint: true,
+		GasLimit:             uint64(tx.Fee),
+	}, new(Resolver), &compiler.SimpleGasPolicy{GasPerInstruction: 1})
+	if err != nil {
+		return nil, err
 	}
 
 	// Get the function ID of the entry function to be executed.
@@ -113,14 +106,6 @@ func (w *Wasm) Exec_Call(payload *types2.WasmCall, tx *types.Transaction, index 
 	w.contractName = payload.Contract
 	w.tx = tx
 	w.execAddr = address.ExecAddress(string(types.GetRealExecName(tx.Execer)))
-	w.ENV = make(map[int]string)
-	w.localCache = nil
-	w.kvs = nil
-	w.receiptLogs = nil
-	w.customLogs = nil
-	for i, v := range payload.Env {
-		w.ENV[i] = v
-	}
 	wasmCB = w
 	defer func() {
 		wasmCB = nil
@@ -130,6 +115,7 @@ func (w *Wasm) Exec_Call(payload *types2.WasmCall, tx *types.Transaction, index 
 	if err != nil {
 		return nil, err
 	}
+
 	var kvs []*types.KeyValue
 	kvs = append(kvs, w.kvs...)
 	kvs = append(kvs, w.stateKVC.KVList()...)
@@ -138,7 +124,7 @@ func (w *Wasm) Exec_Call(payload *types2.WasmCall, tx *types.Transaction, index 
 	logs = append(logs, &types.ReceiptLog{Ty: types2.TyLogWasmCall, Log: types.Encode(&types2.CallContractLog{
 		Contract: payload.Contract,
 		Method:   payload.Method,
-		Result:   int32(ret),
+		Result:   ret,
 	})})
 	logs = append(logs, w.receiptLogs...)
 	logs = append(logs, &types.ReceiptLog{Ty: types2.TyLogCustom, Log: types.Encode(&types2.CustomLog{
@@ -156,7 +142,7 @@ func (w *Wasm) Exec_Call(payload *types2.WasmCall, tx *types.Transaction, index 
 		KV:   kvs,
 		Logs: logs,
 	}
-	if int32(ret) < 0 || int16(ret) < 0 {
+	if ret < 0 {
 		receipt.Ty = types.ExecPack
 	}
 

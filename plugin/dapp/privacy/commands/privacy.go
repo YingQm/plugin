@@ -12,11 +12,11 @@ import (
 
 	"strings"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/rpc/jsonclient"
-	rpctypes "github.com/33cn/chain33/rpc/types"
-	cmdtypes "github.com/33cn/chain33/system/dapp/commands/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/rpc/jsonclient"
+	rpctypes "github.com/33cn/dplatformos/rpc/types"
+	cmdtypes "github.com/33cn/dplatformos/system/dapp/commands/types"
+	"github.com/33cn/dplatformos/types"
 	pty "github.com/33cn/plugin/plugin/dapp/privacy/types"
 	"github.com/spf13/cobra"
 )
@@ -95,7 +95,7 @@ func createPub2PrivTxFlags(cmd *cobra.Command) {
 	cmd.Flags().Float64P("amount", "a", 0.0, "transfer amount, at most 4 decimal places")
 	cmd.MarkFlagRequired("amount")
 
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
 	cmd.Flags().StringP("note", "n", "", "note for transaction")
 	cmd.Flags().Int64P("expire", "x", 0, "transfer expire, default one hour")
@@ -158,7 +158,7 @@ func createPriv2PrivTxFlags(cmd *cobra.Command) {
 	cmd.MarkFlagRequired("from")
 
 	cmd.Flags().Int32P("mixcount", "m", defMixCount, "utxo mix count")
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
 	cmd.Flags().StringP("note", "n", "", "note for transaction")
 	cmd.Flags().Int64P("expire", "x", 0, "transfer expire, default one hour")
@@ -225,7 +225,7 @@ func createPriv2PubTxFlags(cmd *cobra.Command) {
 	cmd.MarkFlagRequired("to")
 
 	cmd.Flags().Int32P("mixcount", "m", defMixCount, "utxo mix count")
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
 	cmd.Flags().StringP("note", "n", "", "note for transaction")
 	cmd.Flags().Int64P("expire", "x", 0, "transfer expire, default one hour")
@@ -285,7 +285,7 @@ func showPrivacyAccountSpendCmd() *cobra.Command {
 func showPrivacyAccountSpendFlag(cmd *cobra.Command) {
 	cmd.Flags().StringP("addr", "a", "", "account address")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 	cmd.MarkFlagRequired("addr")
 }
 
@@ -360,7 +360,7 @@ func showAmountsOfUTXOCmd() *cobra.Command {
 
 func showAmountOfUTXOFlag(cmd *cobra.Command) {
 
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
 }
 
@@ -375,7 +375,7 @@ func showAmountOfUTXO(cmd *cobra.Command, args []string) {
 	params.Payload = types.MustPBToJSON(&reqPrivacyToken)
 
 	var res pty.ReplyPrivacyAmounts
-	ctx := jsonclient.NewRPCCtx(rpcLaddr, "Chain33.Query", params, &res)
+	ctx := jsonclient.NewRPCCtx(rpcLaddr, "DplatformOS.Query", params, &res)
 	ctx.SetResultCb(parseShowAmountOfUTXORes)
 	ctx.Run()
 }
@@ -402,7 +402,7 @@ func showUTXOs4SpecifiedAmountFlag(cmd *cobra.Command) {
 	cmd.Flags().Float64P("amount", "a", 0, "amount")
 	cmd.MarkFlagRequired("amount")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 }
 
 func showUTXOs4SpecifiedAmount(cmd *cobra.Command, args []string) {
@@ -422,7 +422,7 @@ func showUTXOs4SpecifiedAmount(cmd *cobra.Command, args []string) {
 	params.Payload = types.MustPBToJSON(&reqPrivacyToken)
 
 	var res pty.ReplyUTXOsOfAmount
-	ctx := jsonclient.NewRPCCtx(rpcLaddr, "Chain33.Query", params, &res)
+	ctx := jsonclient.NewRPCCtx(rpcLaddr, "DplatformOS.Query", params, &res)
 	ctx.SetResultCb(parseShowUTXOs4SpecifiedAmountRes)
 	ctx.Run()
 }
@@ -457,7 +457,7 @@ func showPrivacyAccountInfoFlag(cmd *cobra.Command) {
 	cmd.Flags().StringP("addr", "a", "", "account address")
 	cmd.MarkFlagRequired("addr")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
-	cmd.Flags().StringP("symbol", "s", "BTY", "asset symbol, default BTY")
+	cmd.Flags().StringP("symbol", "s", "DPOM", "asset symbol, default DPOM")
 	cmd.Flags().Int32P("displaymode", "d", 0, "display mode.(0: display collect. 1:display available detail. 2:display frozen detail. 3:display all")
 }
 
@@ -549,12 +549,12 @@ func addListPrivacyTxsFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("addr", "a", "", "account address")
 	cmd.MarkFlagRequired("addr")
 	//
-	cmd.Flags().Int32P("sendrecv", "f", 0, "send or recv flag (0: send, 1: recv), default 0")
+	cmd.Flags().Int32P("sendrecv", "", 0, "send or recv flag (0: send, 1: recv), default 0")
 	cmd.Flags().Int32P("count", "c", 10, "number of transactions, default 10")
 	cmd.Flags().StringP("exec", "e", "coins", "asset executor(coins, token, paracross), default coins")
-	cmd.Flags().StringP("symbol", "s", types.BTY, "asset sysmbol.(BTY default)")
+	cmd.Flags().StringP("token", "", types.DPOM, "token name.(DPOM supported)")
 	cmd.Flags().Int32P("direction", "d", 1, "query direction (0: pre page, 1: next page), valid with seedtxhash param")
-	cmd.Flags().StringP("txHeightIndex", "x", "", "start tx height index string")
+	cmd.Flags().StringP("seedtxhash", "", "", "seed trasnaction hash")
 }
 
 func listPrivacyTxsFlags(cmd *cobra.Command, args []string) {
@@ -563,17 +563,17 @@ func listPrivacyTxsFlags(cmd *cobra.Command, args []string) {
 	direction, _ := cmd.Flags().GetInt32("direction")
 	addr, _ := cmd.Flags().GetString("addr")
 	sendRecvFlag, _ := cmd.Flags().GetInt32("sendrecv")
-	symbol, _ := cmd.Flags().GetString("symbol")
-	txHeightIndex, _ := cmd.Flags().GetString("txHeightIndex")
+	tokenname, _ := cmd.Flags().GetString("token")
+	seedtxhash, _ := cmd.Flags().GetString("seedtxhash")
 	exec, _ := cmd.Flags().GetString("exec")
 	params := pty.ReqPrivacyTransactionList{
-		AssetExec:          exec,
-		AssetSymbol:        symbol,
-		SendRecvFlag:       sendRecvFlag,
-		Direction:          direction,
-		Count:              count,
-		Address:            addr,
-		StartTxHeightIndex: txHeightIndex,
+		AssetExec:    exec,
+		Tokenname:    tokenname,
+		SendRecvFlag: sendRecvFlag,
+		Direction:    direction,
+		Count:        count,
+		Address:      addr,
+		Seedtxhash:   []byte(seedtxhash),
 	}
 	var res rpctypes.WalletTxDetails
 	ctx := jsonclient.NewRPCCtx(rpcLaddr, "privacy.GetPrivacyTxByAddr", params, &res)

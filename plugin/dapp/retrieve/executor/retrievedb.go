@@ -7,14 +7,14 @@ package executor
 import (
 	//"bytes"
 
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/common/address"
-	dbm "github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/common/address"
+	dbm "github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/types"
 
-	//log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/client"
-	"github.com/33cn/chain33/system/dapp"
+	//log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/client"
+	"github.com/33cn/dplatformos/system/dapp"
 	rt "github.com/33cn/plugin/plugin/dapp/retrieve/types"
 )
 

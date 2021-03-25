@@ -5,23 +5,23 @@ set +e
 PWD=$(cd "$(dirname "$0")" && pwd)
 export PATH="$PWD:$PATH"
 
-NODE3="${1}_chain33_1"
-CLI="docker exec ${NODE3} /root/chain33-cli"
+NODE3="${1}_dplatformos_1"
+CLI="docker exec ${NODE3} /root/dplatformos-cli"
 
 NODE2="${1}_chain32_1"
-CLI2="docker exec ${NODE2} /root/chain33-cli"
+CLI2="docker exec ${NODE2} /root/dplatformos-cli"
 
 NODE1="${1}_chain31_1"
-CLI3="docker exec ${NODE1} /root/chain33-cli"
+CLI3="docker exec ${NODE1} /root/dplatformos-cli"
 
 NODE4="${1}_chain30_1"
-CLI4="docker exec ${NODE4} /root/chain33-cli"
+CLI4="docker exec ${NODE4} /root/dplatformos-cli"
 
 NODE5="${1}_chain29_1"
-CLI5="docker exec ${NODE5} /root/chain33-cli"
+CLI5="docker exec ${NODE5} /root/dplatformos-cli"
 
 NODE6="${1}_chain28_1"
-CLI6="docker exec ${NODE6} /root/chain33-cli"
+CLI6="docker exec ${NODE6} /root/dplatformos-cli"
 
 containers=("${NODE1}" "${NODE2}" "${NODE3}" "${NODE4}" "${NODE5}" "${NODE6}")
 forkContainers=("${CLI3}" "${CLI2}" "${CLI}" "${CLI4}" "${CLI5}" "${CLI6}")
@@ -69,23 +69,23 @@ echo "CLI=$CLI"
 
 function base_init() {
     # update test environment
-    sed -i $sedfix 's/^Title.*/Title="local"/g' chain33.toml
-    sed -i $sedfix 's/^TestNet=.*/TestNet=true/g' chain33.toml
+    sed -i $sedfix 's/^Title.*/Title="local"/g' dplatformos.toml
+    sed -i $sedfix 's/^TestNet=.*/TestNet=true/g' dplatformos.toml
 
     # p2p
-    sed -i $sedfix 's/^seeds=.*/seeds=["chain33:13802","chain32:13802","chain31:13802","chain30:13802","chain29:13802","chain28:13802"]/g' chain33.toml
-    sed -i $sedfix 's/^enable=.*/enable=true/g' chain33.toml
-    sed -i $sedfix 's/^isSeed=.*/isSeed=true/g' chain33.toml
-    sed -i $sedfix 's/^innerSeedEnable=.*/innerSeedEnable=false/g' chain33.toml
-    sed -i $sedfix 's/^useGithub=.*/useGithub=false/g' chain33.toml
+    sed -i $sedfix 's/^seeds=.*/seeds=["dplatformos:28805","chain32:28805","chain31:28805","chain30:28805","chain29:28805","chain28:28805"]/g' dplatformos.toml
+    sed -i $sedfix 's/^enable=.*/enable=true/g' dplatformos.toml
+    sed -i $sedfix 's/^isSeed=.*/isSeed=true/g' dplatformos.toml
+    sed -i $sedfix 's/^innerSeedEnable=.*/innerSeedEnable=false/g' dplatformos.toml
+    sed -i $sedfix 's/^useGithub=.*/useGithub=false/g' dplatformos.toml
 
     # rpc
-    sed -i $sedfix 's/^jrpcBindAddr=.*/jrpcBindAddr="0.0.0.0:8801"/g' chain33.toml
-    sed -i $sedfix 's/^grpcBindAddr=.*/grpcBindAddr="0.0.0.0:8802"/g' chain33.toml
-    sed -i $sedfix 's/^whitelist=.*/whitelist=["localhost","127.0.0.1","0.0.0.0"]/g' chain33.toml
+    sed -i $sedfix 's/^jrpcBindAddr=.*/jrpcBindAddr="0.0.0.0:28803"/g' dplatformos.toml
+    sed -i $sedfix 's/^grpcBindAddr=.*/grpcBindAddr="0.0.0.0:28804"/g' dplatformos.toml
+    sed -i $sedfix 's/^whitelist=.*/whitelist=["localhost","127.0.0.1","0.0.0.0"]/g' dplatformos.toml
 
     # wallet
-    sed -i $sedfix 's/^minerdisable=.*/minerdisable=false/g' chain33.toml
+    sed -i $sedfix 's/^minerdisable=.*/minerdisable=false/g' dplatformos.toml
 
 }
 
@@ -866,7 +866,7 @@ function syn_block_timeout() {
         else
             isSyn="true"
             for ((k = 0; k < ${#names[@]}; k++)); do
-                sync_status=$(docker exec "${names[$k]}" /root/chain33-cli net is_sync)
+                sync_status=$(docker exec "${names[$k]}" /root/dplatformos-cli net is_sync)
                 if [ "${sync_status}" = "false" ]; then
                     isSyn="false"
                     break

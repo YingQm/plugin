@@ -5,8 +5,8 @@
 package types
 
 import (
-	"github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/types"
 )
 
 var multisiglog = log15.New("module", "execs.multisig")
@@ -106,7 +106,7 @@ type UnSpentAssetsResult struct {
 	UnSpent string `json:"unspent,omitempty"`
 }
 
-//IsAssetsInvalid 资产的合法性检测，Symbol：必须全部大写，例如：BTY,coins.BTY。exec：必须在types.AllowUserExec中存在
+//IsAssetsInvalid 资产的合法性检测，Symbol：必须全部大写，例如：DPOM,coins.DPOM。exec：必须在types.AllowUserExec中存在
 func IsAssetsInvalid(exec, symbol string) error {
 
 	//exec检测

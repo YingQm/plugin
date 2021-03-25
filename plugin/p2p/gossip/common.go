@@ -13,10 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/types"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 // P2pComm p2p communication
@@ -26,7 +25,7 @@ var P2pComm Comm
 type Comm struct{}
 
 // AddrRouteble address router ,return enbale address
-func (Comm) AddrRouteble(addrs []string, version int32, creds credentials.TransportCredentials) []string {
+func (Comm) AddrRouteble(addrs []string, version int32) []string {
 	var enableAddrs []string
 
 	for _, addr := range addrs {
@@ -35,7 +34,7 @@ func (Comm) AddrRouteble(addrs []string, version int32, creds credentials.Transp
 			log.Error("AddrRouteble", "NewNetAddressString", err.Error())
 			continue
 		}
-		conn, err := netaddr.DialTimeout(version, creds)
+		conn, err := netaddr.DialTimeout(version)
 		if err != nil {
 			//log.Error("AddrRouteble", "DialTimeout", err.Error())
 			continue
@@ -78,8 +77,7 @@ func (c Comm) GetLocalAddr() string {
 
 func (c Comm) dialPeerWithAddress(addr *NetAddress, persistent bool, node *Node) (*Peer, error) {
 	log.Debug("dialPeerWithAddress")
-	conn, err := addr.DialTimeout(node.nodeInfo.channelVersion, node.nodeInfo.cliCreds)
-
+	conn, err := addr.DialTimeout(node.nodeInfo.channelVersion)
 	if err != nil {
 		return nil, err
 	}

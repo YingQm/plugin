@@ -1,22 +1,21 @@
 package executor
 
 import (
-	"encoding/hex"
 	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/account"
-	"github.com/33cn/chain33/client/mocks"
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/db"
-	"github.com/33cn/chain33/rpc/grpcclient"
-	"github.com/33cn/chain33/system/dapp"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/account"
+	"github.com/33cn/dplatformos/client/mocks"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/db"
+	"github.com/33cn/dplatformos/rpc/grpcclient"
+	"github.com/33cn/dplatformos/system/dapp"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	types2 "github.com/33cn/plugin/plugin/dapp/wasm/types"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -34,62 +33,18 @@ var (
 	}
 	wasmAddr string
 
-	cfg *types.Chain33Config
+	cfg *types.DplatformOSConfig
 )
 
 func init() {
-	cfg = types.NewChain33Config(strings.Replace(types.GetDefaultCfgstring(), "Title=\"local\"", "Title=\"chain33\"", 1))
+	cfg = types.NewDplatformOSConfig(strings.Replace(types.GetDefaultCfgstring(), "Title=\"local\"", "Title=\"dplatformos\"", 1))
 	Init(types2.WasmX, cfg, nil)
-}
-
-func BenchmarkWasm_Exec_Call(b *testing.B) {
-	dir, ldb, kvdb := util.CreateTestDB()
-	defer util.CloseTestDB(dir, ldb)
-	acc := initAccount(ldb)
-	testCreate(b, acc, kvdb)
-	testCall(b, acc, kvdb)
-	payload := types2.WasmAction{
-		Ty: types2.WasmActionCall,
-		Value: &types2.WasmAction_Call{
-			Call: &types2.WasmCall{
-				Contract:   "dice",
-				Method:     "play",
-				Parameters: []int64{1, 10},
-			},
-		},
-	}
-	tx := &types.Transaction{
-		Payload: types.Encode(&payload),
-	}
-	tx, err := types.FormatTx(cfg, types2.WasmX, tx)
-	require.Nil(b, err, "format tx error")
-	err = signTx(tx, PrivKeys[1])
-	require.Nil(b, err)
-	wasm := newWasm()
-
-	wasm.SetCoinsAccount(acc)
-	wasm.SetStateDB(kvdb)
-	api := mocks.QueueProtocolAPI{}
-	api.On("GetConfig").Return(cfg)
-	api.On("GetRandNum", mock.Anything).Return(hex.DecodeString("0x0b1f047927e1c42327bdd3222558eaf7b10b998e7a9bb8144e4b2a27ffa53df3"))
-	wasm.SetAPI(&api)
-	wasmCB = wasm.(*Wasm)
-	err = transferToExec(Addrs[1], wasmAddr, 1e9)
-	require.Nil(b, err)
-	wasmCB = nil
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, err := wasm.Exec(tx, 0)
-		require.Nil(b, err)
-	}
-	b.StopTimer()
 }
 
 func TestWasm_Exec(t *testing.T) {
 	dir, ldb, kvdb := util.CreateTestDB()
 	defer util.CloseTestDB(dir, ldb)
-	acc := initAccount(ldb)
+	acc := initAccount(t, ldb)
 
 	testCreate(t, acc, kvdb)
 	testCall(t, acc, kvdb)
@@ -99,7 +54,7 @@ func TestWasm_Callback(t *testing.T) {
 	dir, ldb, kvdb := util.CreateTestDB()
 	defer util.CloseTestDB(dir, ldb)
 	wasmCB = newWasm().(*Wasm)
-	acc := initAccount(ldb)
+	acc := initAccount(t, ldb)
 	wasmCB.SetCoinsAccount(acc)
 	wasmCB.SetStateDB(kvdb)
 	wasmCB.SetLocalDB(kvdb)
@@ -263,7 +218,7 @@ func TestWasm_Callback(t *testing.T) {
 	t.Log(random)
 }
 
-func testCreate(t testing.TB, acc *account.DB, stateDB db.KV) {
+func testCreate(t *testing.T, acc *account.DB, stateDB db.KV) {
 	code, err := ioutil.ReadFile("../contracts/dice/dice.wasm")
 	require.Nil(t, err, "read wasm file error")
 	payload := types2.WasmAction{
@@ -298,7 +253,7 @@ func testCreate(t testing.TB, acc *account.DB, stateDB db.KV) {
 	require.Nil(t, err)
 }
 
-func testCall(t testing.TB, acc *account.DB, stateDB db.KV) {
+func testCall(t *testing.T, acc *account.DB, stateDB db.KV) {
 	payload := types2.WasmAction{
 		Ty: types2.WasmActionCall,
 		Value: &types2.WasmAction_Call{
@@ -332,12 +287,10 @@ func testCall(t testing.TB, acc *account.DB, stateDB db.KV) {
 	require.Equal(t, int32(types2.TyLogWasmCall), receipt.Logs[0].Ty)
 }
 
-func initAccount(db db.KV) *account.DB {
+func initAccount(t *testing.T, db db.KV) *account.DB {
 	wasmAddr = address.ExecAddress(cfg.ExecName(types2.WasmX))
-	acc, err := account.NewAccountDB(cfg, "coins", "bty", db)
-	if err != nil {
-		panic(err)
-	}
+	acc, err := account.NewAccountDB(cfg, "coins", "dpos", db)
+	require.Nil(t, err, "new account db error")
 	acc.SaveAccount(&types.Account{
 		Balance: 1e10,
 		Addr:    Addrs[0],

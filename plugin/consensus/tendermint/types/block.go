@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/merkle"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/merkle"
+	"github.com/33cn/dplatformos/types"
 	tmtypes "github.com/33cn/plugin/plugin/dapp/valnode/types"
 )
 
@@ -201,7 +201,7 @@ func (h *Header) StringIndented(indent string) string {
 %s  LastCommit:     %v
 %s  Validators:     %v
 %s  App:            %v
-%s  Consensus:      %v
+%s  Conensus:       %v
 %s  Results:        %v
 %s}#%v`,
 		indent, h.ChainID,
@@ -304,7 +304,7 @@ func (commit *Commit) IsCommit() bool {
 
 // GetAggVote ...
 func (commit *Commit) GetAggVote() *AggVote {
-	if commit == nil || commit.AggVote == nil {
+	if commit == nil {
 		return nil
 	}
 	aggVote := &AggVote{commit.AggVote}

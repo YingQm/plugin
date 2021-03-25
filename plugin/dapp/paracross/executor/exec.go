@@ -7,7 +7,7 @@ package executor
 import (
 	"encoding/hex"
 
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/types"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 )
 
@@ -73,7 +73,7 @@ func (e *Paracross) Exec_CrossAssetTransfer(payload *pt.CrossAssetTransfer, tx *
 
 //Exec_Miner miner tx exec process
 func (e *Paracross) Exec_Miner(payload *pt.ParacrossMinerAction, tx *types.Transaction, index int) (*types.Receipt, error) {
-	if index != 0 && payload.AddIssueCoins <= 0 {
+	if index != 0 {
 		return nil, pt.ErrParaMinerBaseIndex
 	}
 	cfg := e.GetAPI().GetConfig()

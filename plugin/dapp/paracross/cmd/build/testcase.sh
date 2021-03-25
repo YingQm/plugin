@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-PARA_CLI="docker exec ${NODE3} /root/chain33-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
+PARA_CLI="docker exec ${NODE3} /root/dplatformos-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
 
-PARA_CLI2="docker exec ${NODE2} /root/chain33-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
-PARA_CLI1="docker exec ${NODE1} /root/chain33-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
-PARA_CLI4="docker exec ${NODE4} /root/chain33-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
-PARA_CLI5="docker exec ${NODE5} /root/chain33-cli --paraName user.p.game. --rpc_laddr http://localhost:8901"
-MAIN_CLI="docker exec ${NODE3} /root/chain33-cli"
+PARA_CLI2="docker exec ${NODE2} /root/dplatformos-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
+PARA_CLI1="docker exec ${NODE1} /root/dplatformos-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
+PARA_CLI4="docker exec ${NODE4} /root/dplatformos-cli --paraName user.p.para. --rpc_laddr http://localhost:8901"
+PARA_CLI5="docker exec ${NODE5} /root/dplatformos-cli --paraName user.p.game. --rpc_laddr http://localhost:8901"
+MAIN_CLI="docker exec ${NODE3} /root/dplatformos-cli"
 
 PARANAME="para"
 PARANAME_GAME="game"
@@ -27,22 +27,22 @@ fi
 #source test-rpc.sh
 
 function para_init() {
-    para_set_toml chain33.para33.toml "$PARANAME" "$1"
-    para_set_toml chain33.para32.toml "$PARANAME" "$1"
-    para_set_toml chain33.para31.toml "$PARANAME" "$1"
-    para_set_toml chain33.para30.toml "$PARANAME" "$1"
+    para_set_toml dplatformos.para33.toml "$PARANAME" "$1"
+    para_set_toml dplatformos.para32.toml "$PARANAME" "$1"
+    para_set_toml dplatformos.para31.toml "$PARANAME" "$1"
+    para_set_toml dplatformos.para30.toml "$PARANAME" "$1"
 
-    sed -i $xsedfix 's/^authAccount=.*/authAccount="1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"/g' chain33.para33.toml
-    sed -i $xsedfix 's/^authAccount=.*/authAccount="1JRNjdEqp4LJ5fqycUBm9ayCKSeeskgMKR"/g' chain33.para32.toml
-    sed -i $xsedfix 's/^authAccount=.*/authAccount="1NLHPEcbTWWxxU3dGUZBhayjrCHD3psX7k"/g' chain33.para31.toml
-    sed -i $xsedfix 's/^authAccount=.*/authAccount="1MCftFynyvG2F4ED5mdHYgziDxx6vDrScs"/g' chain33.para30.toml
+    sed -i $xsedfix 's/^authAccount=.*/authAccount="1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"/g' dplatformos.para33.toml
+    sed -i $xsedfix 's/^authAccount=.*/authAccount="1JRNjdEqp4LJ5fqycUBm9ayCKSeeskgMKR"/g' dplatformos.para32.toml
+    sed -i $xsedfix 's/^authAccount=.*/authAccount="1NLHPEcbTWWxxU3dGUZBhayjrCHD3psX7k"/g' dplatformos.para31.toml
+    sed -i $xsedfix 's/^authAccount=.*/authAccount="1MCftFynyvG2F4ED5mdHYgziDxx6vDrScs"/g' dplatformos.para30.toml
 
-    para_set_toml chain33.para29.toml "$PARANAME_GAME" "$1"
-    sed -i $xsedfix 's/^authAccount=.*/authAccount="1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"/g' chain33.para29.toml
+    para_set_toml dplatformos.para29.toml "$PARANAME_GAME" "$1"
+    sed -i $xsedfix 's/^authAccount=.*/authAccount="1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"/g' dplatformos.para29.toml
 }
 
 function para_set_toml() {
-    cp chain33.para.toml "${1}"
+    cp dplatformos.para.toml "${1}"
     local paraname="$2"
 
     sed -i $xsedfix 's/^Title.*/Title="user.p.'''"$paraname"'''."/g' "${1}"
@@ -207,7 +207,7 @@ function para_transfer() {
 
     echo "=========== # config token blacklist ============="
     #token precreate
-    txhash=$(para_configkey "${PARA_CLI}" "token-blacklist" "BTY")
+    txhash=$(para_configkey "${PARA_CLI}" "token-blacklist" "DPOM")
     echo "txhash=$txhash"
     query_tx "${PARA_CLI}" "${txhash}"
 
@@ -382,7 +382,7 @@ function para_cross_transfer_withdraw() {
     local times=200
     while true; do
         acc=$(${CLI} account balance -e paracross -a 12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv | jq -r ".balance")
-        acc_para=$(${PARA_CLI} asset balance -a 12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv --asset_exec paracross --asset_symbol coins.bty | jq -r ".balance")
+        acc_para=$(${PARA_CLI} asset balance -a 12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv --asset_exec paracross --asset_symbol coins.dpos | jq -r ".balance")
         echo "account balance is ${acc}, expect 9.3, para acct balance is ${acc_para},expect 0.7 "
         if [ "${acc}" != "9.3000" ] || [ "${acc_para}" != "0.7000" ]; then
             block_wait "${CLI}" 2
@@ -391,7 +391,7 @@ function para_cross_transfer_withdraw() {
                 echo "para_cross_transfer_withdraw failed"
                 ${CLI} tx query -s "$hash2"
                 ${PARA_CLI} tx query -s "$hash2"
-                ${PARA_CLI} asset balance -a 12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv --asset_exec paracross --asset_symbol coins.bty
+                ${PARA_CLI} asset balance -a 12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv --asset_exec paracross --asset_symbol coins.dpos
                 exit 1
             fi
         else
@@ -421,7 +421,7 @@ function para_cross_transfer_withdraw() {
 function token_create_on_mainChain() {
     echo "=========== # main chain token test ============="
     echo "=========== # 0.config token-blacklist ============="
-    hash=$(${CLI} send config config_tx -c token-blacklist -o add -v BTY -k 0xc34b5d9d44ac7b754806f761d3d4d2c4fe5214f6b074c19f069c4f5c2a29c8cc)
+    hash=$(${CLI} send config config_tx -c token-blacklist -o add -v DPOM -k 0xc34b5d9d44ac7b754806f761d3d4d2c4fe5214f6b074c19f069c4f5c2a29c8cc)
     echo "${hash}"
     query_tx "${MAIN_CLI}" "${hash}"
 
@@ -1065,22 +1065,22 @@ function privacy_transfer_test() {
     block_wait "${1}" 2
 
     echo "#privacy pub2priv, to=14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
-    ${1} send privacy pub2priv -a 9 -p fcbb75f2b96b6d41f301f2d1abc853d697818427819f412f8e4b4e12cacc0814d2c3914b27bea9151b8968ed1732bd241c8788a332b295b731aee8d39a060388 -e coins -s BTY -k 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4
+    ${1} send privacy pub2priv -a 9 -p fcbb75f2b96b6d41f301f2d1abc853d697818427819f412f8e4b4e12cacc0814d2c3914b27bea9151b8968ed1732bd241c8788a332b295b731aee8d39a060388 -e coins -s DPOM -k 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4
     ${1} send privacy pub2priv -a 9 -p fcbb75f2b96b6d41f301f2d1abc853d697818427819f412f8e4b4e12cacc0814d2c3914b27bea9151b8968ed1732bd241c8788a332b295b731aee8d39a060388 -e token -s GD -k 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4
     check_privacy_utxo "${1}" 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt token GD 9.0000
-    check_privacy_utxo "${1}" 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt coins BTY 9.0000
+    check_privacy_utxo "${1}" 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt coins DPOM 9.0000
 
     echo "#privacy priv2priv, to=1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"
-    ${1} send privacy priv2priv -a 3 -p 5b0ff936ec2d2825a67a270e34d741d96bf6afe5d4b5692de0a1627f635fd0b3d7b14e44d3f8f7526030a7c59de482084161b441a5d66b483d80316e3b91482b -f 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt -e coins -s BTY -k 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt
+    ${1} send privacy priv2priv -a 3 -p 5b0ff936ec2d2825a67a270e34d741d96bf6afe5d4b5692de0a1627f635fd0b3d7b14e44d3f8f7526030a7c59de482084161b441a5d66b483d80316e3b91482b -f 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt -e coins -s DPOM -k 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt
     ${1} send privacy priv2priv -a 3 -p 5b0ff936ec2d2825a67a270e34d741d96bf6afe5d4b5692de0a1627f635fd0b3d7b14e44d3f8f7526030a7c59de482084161b441a5d66b483d80316e3b91482b -f 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt -e token -s GD -k 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt
     check_privacy_utxo "${1}" 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4 token GD 3.0000
-    check_privacy_utxo "${1}" 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4 coins BTY 3.0000
+    check_privacy_utxo "${1}" 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4 coins DPOM 3.0000
 
     echo "#privacy priv2pub, to=1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4"
-    ${1} send privacy priv2pub -a 6 -t 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4 -f 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt -e coins -s BTY -k 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt
+    ${1} send privacy priv2pub -a 6 -t 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4 -f 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt -e coins -s DPOM -k 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt
     ${1} send privacy priv2pub -a 6 -t 1KSBd17H7ZK8iT37aJztFB22XGwsPTdwE4 -f 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt -e token -s GD -k 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt
     check_privacy_utxo "${1}" 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt token GD 0.0000
-    check_privacy_utxo "${1}" 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt coins BTY 0.0000
+    check_privacy_utxo "${1}" 14KEKbYtKKQm4wMthSK9J4La4nAiidGozt coins DPOM 0.0000
 }
 
 function para_test() {

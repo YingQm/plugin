@@ -19,9 +19,9 @@ import (
 
 	"bytes"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/types"
 	paracross "github.com/33cn/plugin/plugin/dapp/paracross/types"
 	pt "github.com/33cn/plugin/plugin/dapp/paracross/types"
 	"github.com/pkg/errors"
@@ -490,10 +490,6 @@ func (client *commitMsgClient) getTxsGroup(txsArr *types.Transactions) (*types.T
 
 func (client *commitMsgClient) getExecName(commitHeight int64) string {
 	cfg := client.paraClient.GetAPI().GetConfig()
-	if cfg.IsDappFork(commitHeight, pt.ParaX, pt.ForkParaFullMinerHeight) {
-		return paracross.GetExecName(cfg)
-	}
-
 	if cfg.IsDappFork(commitHeight, pt.ParaX, pt.ForkParaSelfConsStages) {
 		return paracross.GetExecName(cfg)
 	}

@@ -16,24 +16,24 @@ import (
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/blockchain"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/limits"
-	"github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/executor"
-	"github.com/33cn/chain33/mempool"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/rpc"
-	"github.com/33cn/chain33/store"
-	mty "github.com/33cn/chain33/system/dapp/manage/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/blockchain"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/limits"
+	"github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/executor"
+	"github.com/33cn/dplatformos/mempool"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/rpc"
+	"github.com/33cn/dplatformos/store"
+	mty "github.com/33cn/dplatformos/system/dapp/manage/types"
+	"github.com/33cn/dplatformos/types"
 	ty "github.com/33cn/plugin/plugin/consensus/tendermint/types"
 	pty "github.com/33cn/plugin/plugin/dapp/norm/types"
 	vty "github.com/33cn/plugin/plugin/dapp/valnode/types"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 
-	_ "github.com/33cn/chain33/system"
+	_ "github.com/33cn/dplatformos/system"
 	_ "github.com/33cn/plugin/plugin/dapp/init"
 	_ "github.com/33cn/plugin/plugin/store/init"
 )
@@ -42,7 +42,7 @@ var (
 	r         *rand.Rand
 	loopCount = 3
 	conn      *grpc.ClientConn
-	c         types.Chain33Client
+	c         types.DplatformOSClient
 )
 
 func init() {
@@ -74,13 +74,13 @@ func TendermintPerf(t *testing.T) {
 	time.Sleep(2 * time.Second)
 	ConfigManager()
 	for i := 0; i < loopCount; i++ {
-		NormPut(q.GetConfig().GetChainID())
+		NormPut()
 		time.Sleep(time.Second)
 	}
 	CheckState(t, cs.(*Client))
 	AddNode()
 	for i := 0; i < loopCount*3; i++ {
-		NormPut(q.GetConfig().GetChainID())
+		NormPut()
 		time.Sleep(time.Second)
 	}
 	time.Sleep(2 * time.Second)
@@ -88,25 +88,25 @@ func TendermintPerf(t *testing.T) {
 
 func initEnvTendermint() (queue.Queue, *blockchain.BlockChain, queue.Module, queue.Module, *executor.Executor, queue.Module) {
 	flag.Parse()
-	chain33Cfg := types.NewChain33Config(types.ReadFile("chain33.test.toml"))
+	dplatformosCfg := types.NewDplatformOSConfig(types.ReadFile("dplatformos.test.toml"))
 	var q = queue.New("channel")
-	q.SetConfig(chain33Cfg)
-	cfg := chain33Cfg.GetModuleConfig()
-	sub := chain33Cfg.GetSubConfig()
+	q.SetConfig(dplatformosCfg)
+	cfg := dplatformosCfg.GetModuleConfig()
+	sub := dplatformosCfg.GetSubConfig()
 
-	chain := blockchain.New(chain33Cfg)
+	chain := blockchain.New(dplatformosCfg)
 	chain.SetQueueClient(q.Client())
 
-	exec := executor.New(chain33Cfg)
+	exec := executor.New(dplatformosCfg)
 	exec.SetQueueClient(q.Client())
-	chain33Cfg.SetMinFee(0)
-	s := store.New(chain33Cfg)
+	dplatformosCfg.SetMinFee(0)
+	s := store.New(dplatformosCfg)
 	s.SetQueueClient(q.Client())
 
 	cs := New(cfg.Consensus, sub.Consensus["tendermint"])
 	cs.SetQueueClient(q.Client())
 
-	mem := mempool.New(chain33Cfg)
+	mem := mempool.New(dplatformosCfg)
 	mem.SetQueueClient(q.Client())
 
 	rpc.InitCfg(cfg.RPC)
@@ -117,14 +117,14 @@ func initEnvTendermint() (queue.Queue, *blockchain.BlockChain, queue.Module, que
 
 func createConn() error {
 	var err error
-	url := "127.0.0.1:8802"
+	url := "127.0.0.1:28804"
 	fmt.Println("grpc url:", url)
 	conn, err = grpc.Dial(url, grpc.WithInsecure())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	c = types.NewChain33Client(conn)
+	c = types.NewDplatformOSClient(conn)
 	return nil
 }
 
@@ -148,7 +148,7 @@ func generateValue(i, valI int) string {
 	return string(value)
 }
 
-func prepareTxList(chainid int32) *types.Transaction {
+func prepareTxList() *types.Transaction {
 	var key string
 	var value string
 	var i int
@@ -161,7 +161,6 @@ func prepareTxList(chainid int32) *types.Transaction {
 	tx := &types.Transaction{Execer: []byte("norm"), Payload: types.Encode(action), Fee: fee}
 	tx.To = address.ExecAddress("norm")
 	tx.Nonce = r.Int63()
-	tx.ChainID = chainid
 	tx.Sign(types.SECP256K1, getprivkey("CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"))
 	return tx
 }
@@ -174,8 +173,8 @@ func clearTestData() {
 	fmt.Println("test data clear successfully!")
 }
 
-func NormPut(chainid int32) {
-	tx := prepareTxList(chainid)
+func NormPut() {
+	tx := prepareTxList()
 
 	reply, err := c.SendTransaction(context.Background(), tx)
 	if err != nil {
@@ -200,10 +199,6 @@ func AddNode() {
 	tx := &types.Transaction{Execer: []byte("valnode"), Payload: types.Encode(action), Fee: fee}
 	tx.To = address.ExecAddress("valnode")
 	tx.Nonce = r.Int63()
-	version, _ := c.Version(context.Background(), nil)
-	if version != nil {
-		tx.ChainID = version.ChainID
-	}
 	tx.Sign(types.SECP256K1, getprivkey("CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"))
 
 	reply, err := c.SendTransaction(context.Background(), tx)
@@ -226,11 +221,6 @@ func ConfigManager() {
 	tx := &types.Transaction{Execer: []byte("manage"), Payload: types.Encode(modify), Fee: fee}
 	tx.To = address.ExecAddress("manage")
 	tx.Nonce = r.Int63()
-	version, _ := c.Version(context.Background(), nil)
-	if version != nil {
-		tx.ChainID = version.ChainID
-
-	}
 	tx.Sign(types.SECP256K1, getprivkey("CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"))
 
 	reply, err := c.SendTransaction(context.Background(), tx)
@@ -282,7 +272,7 @@ func CheckState(t *testing.T, client *Client) {
 
 	assert.Equal(t, client.csState.Prevote(0), 1000*time.Millisecond)
 	assert.Equal(t, client.csState.Precommit(0), 1000*time.Millisecond)
-	assert.Equal(t, client.csState.PeerGossipSleep(), 100*time.Millisecond)
+	assert.Equal(t, client.csState.PeerGossipSleep(), 200*time.Millisecond)
 	assert.Equal(t, client.csState.PeerQueryMaj23Sleep(), 2000*time.Millisecond)
 	assert.Equal(t, client.csState.IsProposer(), true)
 	assert.Nil(t, client.csState.GetPrevotesState(state.LastBlockHeight, 0, nil))
@@ -296,7 +286,7 @@ func CheckState(t *testing.T, client *Client) {
 
 	msg2, err := client.Query_NodeInfo(&types.ReqNil{})
 	assert.Nil(t, err)
-	tvals := msg2.(*vty.ValNodeInfoSet).Nodes
+	tvals := msg2.(*vty.ValidatorSet).Validators
 	assert.Len(t, tvals, 1)
 
 	err = client.CommitBlock(client.GetCurrentBlock())

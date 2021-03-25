@@ -6,10 +6,10 @@ import (
 
 	"sync"
 
-	log "github.com/33cn/chain33/common/log/log15"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/rpc/grpcclient"
-	"github.com/33cn/chain33/types"
+	log "github.com/33cn/dplatformos/common/log/log15"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/rpc/grpcclient"
+	"github.com/33cn/dplatformos/types"
 )
 
 var mlog = log.New("module", "mempool.para")
@@ -20,7 +20,7 @@ type Mempool struct {
 	key         string
 	wg          sync.WaitGroup
 	client      queue.Client
-	mainGrpcCli types.Chain33Client
+	mainGrpcCli types.DplatformOSClient
 	isclose     int32
 }
 
@@ -67,7 +67,7 @@ func (mem *Mempool) SetQueueClient(client queue.Client) {
 	}()
 }
 
-func (mem *Mempool) setMainGrpcCli(cfg *types.Chain33Config) {
+func (mem *Mempool) setMainGrpcCli(cfg *types.DplatformOSConfig) {
 	if cfg != nil && cfg.IsPara() {
 		grpcCli, err := grpcclient.NewMainChainClient(cfg, "")
 		if err != nil {

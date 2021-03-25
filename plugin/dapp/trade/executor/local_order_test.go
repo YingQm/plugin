@@ -3,17 +3,17 @@ package executor
 import (
 	"testing"
 
-	"github.com/33cn/chain33/system/dapp"
+	"github.com/33cn/dplatformos/system/dapp"
 	pty "github.com/33cn/plugin/plugin/dapp/trade/types"
 
-	//"github.com/33cn/chain33/common/db"
-	//"github.com/33cn/chain33/common/db/table"
-	"github.com/33cn/chain33/util"
+	//"github.com/33cn/dplatformos/common/db"
+	//"github.com/33cn/dplatformos/common/db/table"
+	"github.com/33cn/dplatformos/util"
 	"github.com/stretchr/testify/assert"
 )
 
 var order1 = &pty.LocalOrder{
-	AssetSymbol:       "bty",
+	AssetSymbol:       "dpos",
 	Owner:             "O1",
 	AmountPerBoardlot: 1,
 	MinBoardlot:       1,
@@ -36,7 +36,7 @@ var order1 = &pty.LocalOrder{
 }
 
 var order2 = &pty.LocalOrder{
-	AssetSymbol:       "bty",
+	AssetSymbol:       "dpos",
 	Owner:             "O1",
 	AmountPerBoardlot: 1,
 	MinBoardlot:       1,

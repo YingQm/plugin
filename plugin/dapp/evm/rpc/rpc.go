@@ -11,10 +11,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	cty "github.com/33cn/chain33/system/dapp/coins/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	cty "github.com/33cn/dplatformos/system/dapp/coins/types"
+	"github.com/33cn/dplatformos/types"
 	evmtypes "github.com/33cn/plugin/plugin/dapp/evm/types"
 )
 
@@ -40,7 +40,7 @@ func (c *channelClient) Create(ctx context.Context, in evmtypes.EvmContractCreat
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 	tx.Nonce = random.Int63()
-	tx.ChainID = cfg.GetChainID()
+
 	txHex := types.Encode(tx)
 
 	return &types.UnsignTx{Data: txHex}, nil
@@ -69,7 +69,7 @@ func (c *channelClient) Call(ctx context.Context, in evmtypes.EvmContractCallReq
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 	tx.Nonce = random.Int63()
-	tx.ChainID = cfg.GetChainID()
+
 	txHex := types.Encode(tx)
 
 	return &types.UnsignTx{Data: txHex}, nil
@@ -103,7 +103,7 @@ func (c *channelClient) Transfer(ctx context.Context, in evmtypes.EvmContractTra
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 	tx.Nonce = random.Int63()
-	tx.ChainID = cfg.GetChainID()
+
 	txHex := types.Encode(tx)
 
 	return &types.UnsignTx{Data: txHex}, nil

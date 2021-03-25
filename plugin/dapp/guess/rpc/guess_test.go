@@ -14,29 +14,29 @@ import (
 	"testing"
 	"time"
 
-	"github.com/33cn/chain33/blockchain"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	"github.com/33cn/chain33/common/limits"
-	"github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/executor"
-	"github.com/33cn/chain33/mempool"
-	"github.com/33cn/chain33/p2p"
-	"github.com/33cn/chain33/queue"
-	"github.com/33cn/chain33/rpc"
-	"github.com/33cn/chain33/store"
-	"github.com/33cn/chain33/system/consensus/solo"
-	"github.com/33cn/chain33/types"
-	"github.com/33cn/chain33/util"
+	"github.com/33cn/dplatformos/blockchain"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	"github.com/33cn/dplatformos/common/limits"
+	"github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/executor"
+	"github.com/33cn/dplatformos/mempool"
+	"github.com/33cn/dplatformos/p2p"
+	"github.com/33cn/dplatformos/queue"
+	"github.com/33cn/dplatformos/rpc"
+	"github.com/33cn/dplatformos/store"
+	"github.com/33cn/dplatformos/system/consensus/solo"
+	"github.com/33cn/dplatformos/types"
+	"github.com/33cn/dplatformos/util"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 
-	_ "github.com/33cn/chain33/system"
+	_ "github.com/33cn/dplatformos/system"
 	_ "github.com/33cn/plugin/plugin/store/init"
 
-	jsonrpc "github.com/33cn/chain33/rpc/jsonclient"
-	rpctypes "github.com/33cn/chain33/rpc/types"
-	cty "github.com/33cn/chain33/system/dapp/coins/types"
+	jsonrpc "github.com/33cn/dplatformos/rpc/jsonclient"
+	rpctypes "github.com/33cn/dplatformos/rpc/types"
+	cty "github.com/33cn/dplatformos/system/dapp/coins/types"
 	gty "github.com/33cn/plugin/plugin/dapp/guess/types"
 	pty "github.com/33cn/plugin/plugin/dapp/norm/types"
 )
@@ -53,7 +53,7 @@ FixTime=false
 loglevel = "info"
 logConsoleLevel = "info"
 # 日志文件名，可带目录，所有生成的日志文件都放到此目录下
-logFile = "logs/chain33.log"
+logFile = "logs/dplatformos.log"
 # 单个日志文件的最大值（单位：兆）
 maxFileSize = 300
 # 最多保存的历史日志文件个数
@@ -226,7 +226,7 @@ enableMavlPrune=false
 # 裁剪高度间隔
 pruneHeight=10000
 [wallet]
-# 交易发送最低手续费，单位0.00000001BTY(1e-8),默认100000，即0.001BTY
+# 交易发送最低手续费，单位0.00000001DPOM(1e-8),默认100000，即0.001DPOM
 minFee=100000
 # walletdb驱动名，支持leveldb/memdb/gobadgerdb/ssdb/pegasus
 driver="leveldb"
@@ -284,7 +284,7 @@ var (
 
 	loopCount = 1
 	conn      *grpc.ClientConn
-	c         types.Chain33Client
+	c         types.DplatformOSClient
 	adminPriv = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
 	adminAddr = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
 
@@ -319,15 +319,15 @@ func Init() {
 	fmt.Println("=======Init Data1!=======")
 	os.RemoveAll("datadir")
 	os.RemoveAll("wallet")
-	os.Remove("chain33.test.toml")
+	os.Remove("dplatformos.test.toml")
 
-	ioutil.WriteFile("chain33.test.toml", []byte(config), 0664)
+	ioutil.WriteFile("dplatformos.test.toml", []byte(config), 0664)
 }
 
 func clearTestData() {
 	fmt.Println("=======start clear test data!=======")
 
-	os.Remove("chain33.test.toml")
+	os.Remove("dplatformos.test.toml")
 	os.RemoveAll("wallet")
 	err := os.RemoveAll("datadir")
 	if err != nil {
@@ -363,7 +363,7 @@ func testGuessImp(t *testing.T) {
 	fmt.Println("=======start NormPut!=======")
 
 	for i := 0; i < loopCount; i++ {
-		NormPut(cfg)
+		NormPut()
 		time.Sleep(time.Second)
 	}
 
@@ -643,26 +643,26 @@ func testGuessImp(t *testing.T) {
 
 func initEnvGuess() (queue.Queue, *blockchain.BlockChain, queue.Module, queue.Module, *executor.Executor, queue.Module, queue.Module) {
 	flag.Parse()
-	chain33Cfg := types.NewChain33Config(types.ReadFile("chain33.test.toml"))
+	dplatformosCfg := types.NewDplatformOSConfig(types.ReadFile("dplatformos.test.toml"))
 	var q = queue.New("channel")
-	q.SetConfig(chain33Cfg)
-	cfg := chain33Cfg.GetModuleConfig()
-	sub := chain33Cfg.GetSubConfig()
-	chain := blockchain.New(chain33Cfg)
+	q.SetConfig(dplatformosCfg)
+	cfg := dplatformosCfg.GetModuleConfig()
+	sub := dplatformosCfg.GetSubConfig()
+	chain := blockchain.New(dplatformosCfg)
 	chain.SetQueueClient(q.Client())
 
-	exec := executor.New(chain33Cfg)
+	exec := executor.New(dplatformosCfg)
 	exec.SetQueueClient(q.Client())
-	chain33Cfg.SetMinFee(0)
-	s := store.New(chain33Cfg)
+	dplatformosCfg.SetMinFee(0)
+	s := store.New(dplatformosCfg)
 	s.SetQueueClient(q.Client())
 
 	cs := solo.New(cfg.Consensus, sub.Consensus["solo"])
 	cs.SetQueueClient(q.Client())
 
-	mem := mempool.New(chain33Cfg)
+	mem := mempool.New(dplatformosCfg)
 	mem.SetQueueClient(q.Client())
-	network := p2p.NewP2PMgr(chain33Cfg)
+	network := p2p.NewP2PMgr(dplatformosCfg)
 
 	network.SetQueueClient(q.Client())
 
@@ -685,7 +685,7 @@ func createConn() error {
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	c = types.NewChain33Client(conn)
+	c = types.NewDplatformOSClient(conn)
 	return nil
 }
 
@@ -721,7 +721,7 @@ func getprivkey(key string) crypto.PrivKey {
 	return priv
 }
 
-func prepareTxList(cfg *types.Chain33Config) *types.Transaction {
+func prepareTxList() *types.Transaction {
 	var key string
 	var value string
 	var i int
@@ -734,13 +734,12 @@ func prepareTxList(cfg *types.Chain33Config) *types.Transaction {
 	tx := &types.Transaction{Execer: []byte("norm"), Payload: types.Encode(action), Fee: fee}
 	tx.To = address.ExecAddress("norm")
 	tx.Nonce = random.Int63()
-	tx.ChainID = cfg.GetChainID()
 	tx.Sign(types.SECP256K1, getprivkey("CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"))
 	return tx
 }
 
-func NormPut(cfg *types.Chain33Config) {
-	tx := prepareTxList(cfg)
+func NormPut() {
+	tx := prepareTxList()
 
 	reply, err := c.SendTransaction(context.Background(), tx)
 	if err != nil {
@@ -753,7 +752,7 @@ func NormPut(cfg *types.Chain33Config) {
 	}
 }
 
-func sendTransferTx(cfg *types.Chain33Config, fromKey, to string, amount int64) bool {
+func sendTransferTx(cfg *types.DplatformOSConfig, fromKey, to string, amount int64) bool {
 	signer := util.HexToPrivkey(fromKey)
 	var tx *types.Transaction
 	transfer := &cty.CoinsAction{}
@@ -787,7 +786,7 @@ func sendTransferTx(cfg *types.Chain33Config, fromKey, to string, amount int64) 
 	return true
 }
 
-func sendTransferToExecTx(cfg *types.Chain33Config, fromKey, execName string, amount int64) bool {
+func sendTransferToExecTx(cfg *types.DplatformOSConfig, fromKey, execName string, amount int64) bool {
 	signer := util.HexToPrivkey(fromKey)
 	var tx *types.Transaction
 	transfer := &cty.CoinsAction{}
@@ -824,7 +823,7 @@ func sendTransferToExecTx(cfg *types.Chain33Config, fromKey, execName string, am
 	return true
 }
 
-func sendGuessStartTx(cfg *types.Chain33Config, topic, option, category, privKey string) (bool, []byte) {
+func sendGuessStartTx(cfg *types.DplatformOSConfig, topic, option, category, privKey string) (bool, []byte) {
 	signer := util.HexToPrivkey(privKey)
 	var tx *types.Transaction
 	action := &gty.GuessGameAction{}
@@ -875,7 +874,7 @@ func sendGuessStartTx(cfg *types.Chain33Config, topic, option, category, privKey
 	return true, reply.Msg
 }
 
-func sendGuessBetTx(cfg *types.Chain33Config, gameID, option string, betsNum int64, privKey string) (bool, []byte) {
+func sendGuessBetTx(cfg *types.DplatformOSConfig, gameID, option string, betsNum int64, privKey string) (bool, []byte) {
 	signer := util.HexToPrivkey(privKey)
 	var tx *types.Transaction
 	action := &gty.GuessGameAction{}
@@ -920,7 +919,7 @@ func sendGuessBetTx(cfg *types.Chain33Config, gameID, option string, betsNum int
 	return true, reply.Msg
 }
 
-func sendGuessStopTx(cfg *types.Chain33Config, gameID, privKey string) (bool, []byte) {
+func sendGuessStopTx(cfg *types.DplatformOSConfig, gameID, privKey string) (bool, []byte) {
 	signer := util.HexToPrivkey(privKey)
 	var tx *types.Transaction
 	action := &gty.GuessGameAction{}
@@ -963,7 +962,7 @@ func sendGuessStopTx(cfg *types.Chain33Config, gameID, privKey string) (bool, []
 	return true, reply.Msg
 }
 
-func sendGuessAbortTx(cfg *types.Chain33Config, gameID, privKey string) (bool, []byte) {
+func sendGuessAbortTx(cfg *types.DplatformOSConfig, gameID, privKey string) (bool, []byte) {
 	signer := util.HexToPrivkey(privKey)
 	var tx *types.Transaction
 	action := &gty.GuessGameAction{}
@@ -1006,7 +1005,7 @@ func sendGuessAbortTx(cfg *types.Chain33Config, gameID, privKey string) (bool, [
 	return true, reply.Msg
 }
 
-func sendGuessPublishTx(cfg *types.Chain33Config, gameID, result, privKey string) (bool, []byte) {
+func sendGuessPublishTx(cfg *types.DplatformOSConfig, gameID, result, privKey string) (bool, []byte) {
 	signer := util.HexToPrivkey(privKey)
 	var tx *types.Transaction
 	action := &gty.GuessGameAction{}
@@ -1061,8 +1060,8 @@ func queryGuessByIds(gameIDs string) *gty.ReplyGuessGameInfos {
 	params.FuncName = gty.FuncNameQueryGamesByIDs
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.ReplyGuessGameInfos
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1077,8 +1076,8 @@ func queryGuessByID(gameID string) *gty.ReplyGuessGameInfo {
 	params.FuncName = gty.FuncNameQueryGameByID
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.ReplyGuessGameInfo
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1093,8 +1092,8 @@ func queryGuessByAddr(addr string) *gty.GuessGameRecords {
 	params.FuncName = gty.FuncNameQueryGameByAddr
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.GuessGameRecords
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1109,8 +1108,8 @@ func queryGuessByStatus(status int32) *gty.GuessGameRecords {
 	params.FuncName = gty.FuncNameQueryGameByStatus
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.GuessGameRecords
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1125,8 +1124,8 @@ func queryGuessByAdminAddr(addr string) *gty.GuessGameRecords {
 	params.FuncName = gty.FuncNameQueryGameByAdminAddr
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.GuessGameRecords
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1142,8 +1141,8 @@ func queryGuessByAddrStatus(addr string, status int32) *gty.GuessGameRecords {
 	params.FuncName = gty.FuncNameQueryGameByAddrStatus
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.GuessGameRecords
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1159,8 +1158,8 @@ func queryGuessByAdminAddrStatus(addr string, status int32) *gty.GuessGameRecord
 	params.FuncName = gty.FuncNameQueryGameByAdminStatus
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.GuessGameRecords
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }
@@ -1176,8 +1175,8 @@ func queryGuessByCategoryStatus(category string, status int32) *gty.GuessGameRec
 	params.FuncName = gty.FuncNameQueryGameByCategoryStatus
 	params.Payload = types.MustPBToJSON(req)
 	var res gty.GuessGameRecords
-	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "Chain33.Query", params, &res)
-	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "Chain33.Query", params, &res)
+	//ctx := jsonrpc.NewRPCCtx("http://"+types.Conf("config.rpc").GStr("jrpcBindAddr"), "DplatformOS.Query", params, &res)
+	ctx := jsonrpc.NewRPCCtx("http://127.0.0.1:9801", "DplatformOS.Query", params, &res)
 	ctx.Run()
 	return &res
 }

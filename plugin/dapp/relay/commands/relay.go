@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/33cn/chain33/rpc/jsonclient"
-	rpctypes "github.com/33cn/chain33/rpc/types"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/rpc/jsonclient"
+	rpctypes "github.com/33cn/dplatformos/rpc/types"
+	"github.com/33cn/dplatformos/types"
 	ty "github.com/33cn/plugin/plugin/dapp/relay/types"
 	"github.com/spf13/cobra"
 )
@@ -86,7 +86,7 @@ func showBtcHeadHeightList(cmd *cobra.Command, args []string) {
 	}
 
 	var res ty.ReplyRelayBtcHeadHeightList
-	err = rpc.Call("Chain33.Query", params, &res)
+	err = rpc.Call("DplatformOS.Query", params, &res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -95,7 +95,7 @@ func showBtcHeadHeightList(cmd *cobra.Command, args []string) {
 	parseRelayBtcHeadHeightList(res)
 }
 
-// ShowBTCHeadCurHeightCmd show BTC head current height in chain33
+// ShowBTCHeadCurHeightCmd show BTC head current height in dplatformos
 func ShowBTCHeadCurHeightCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "btc_cur_height",
@@ -130,7 +130,7 @@ func showBtcHeadCurHeight(cmd *cobra.Command, args []string) {
 	}
 
 	var res ty.ReplayRelayQryBTCHeadHeight
-	err = rpc.Call("Chain33.Query", params, &res)
+	err = rpc.Call("DplatformOS.Query", params, &res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -181,7 +181,7 @@ func showOnesRelayOrders(cmd *cobra.Command, args []string) {
 	}
 
 	var res ty.ReplyRelayOrders
-	err = rpc.Call("Chain33.Query", params, &res)
+	err = rpc.Call("DplatformOS.Query", params, &res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -231,7 +231,7 @@ func showRelayAcceptOrders(cmd *cobra.Command, args []string) {
 	}
 
 	var res ty.ReplyRelayOrders
-	err = rpc.Call("Chain33.Query", params, &res)
+	err = rpc.Call("DplatformOS.Query", params, &res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -286,7 +286,7 @@ func showCoinRelayOrders(cmd *cobra.Command, args []string) {
 	}
 
 	var res ty.ReplyRelayOrders
-	err = rpc.Call("Chain33.Query", params, &res)
+	err = rpc.Call("DplatformOS.Query", params, &res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -356,7 +356,7 @@ func addExchangeFlags(cmd *cobra.Command) {
 	cmd.Flags().Uint32P("operation", "o", 0, "0:buy, 1:sell")
 	cmd.MarkFlagRequired("operation")
 
-	cmd.Flags().StringP("coin", "c", "", "coin to exchange by BTY, like BTC,ETH, default BTC")
+	cmd.Flags().StringP("coin", "c", "", "coin to exchange by DPOM, like BTC,ETH, default BTC")
 	cmd.MarkFlagRequired("coin")
 
 	cmd.Flags().Float64P("coin_amount", "m", 0, "coin amount to exchange")
@@ -367,8 +367,8 @@ func addExchangeFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Uint32P("coin_wait", "n", 6, "coin blocks to wait,default:6,min:1")
 
-	cmd.Flags().Float64P("bty_amount", "b", 0, "exchange amount of BTY")
-	cmd.MarkFlagRequired("bty_amount")
+	cmd.Flags().Float64P("dpos_amount", "b", 0, "exchange amount of DPOM")
+	cmd.MarkFlagRequired("dpos_amount")
 
 }
 
@@ -379,13 +379,13 @@ func relayOrder(cmd *cobra.Command, args []string) {
 	coinamount, _ := cmd.Flags().GetFloat64("coin_amount")
 	coinaddr, _ := cmd.Flags().GetString("coin_addr")
 	coinwait, _ := cmd.Flags().GetUint32("coin_wait")
-	btyamount, _ := cmd.Flags().GetFloat64("bty_amount")
+	dposamount, _ := cmd.Flags().GetFloat64("dpos_amount")
 
 	if coinwait == 0 {
 		coinwait = 1
 	}
 
-	btyUInt64 := uint64(btyamount * 1e4)
+	dposUInt64 := uint64(dposamount * 1e4)
 	coinUInt64 := uint64(coinamount * 1e4)
 
 	params := &ty.RelayCreate{
@@ -394,7 +394,7 @@ func relayOrder(cmd *cobra.Command, args []string) {
 		XCoin:           coin,
 		XAddr:           coinaddr,
 		XBlockWaits:     coinwait,
-		LocalCoinAmount: btyUInt64 * 1e4,
+		LocalCoinAmount: dposUInt64 * 1e4,
 	}
 
 	payLoad, err := json.Marshal(params)
@@ -418,7 +418,7 @@ func createTx(cmd *cobra.Command, payLoad []byte, action string) {
 	}
 
 	var res string
-	ctx := jsonclient.NewRPCCtx(rpcLaddr, "Chain33.CreateTransaction", pm, &res)
+	ctx := jsonclient.NewRPCCtx(rpcLaddr, "DplatformOS.CreateTransaction", pm, &res)
 	ctx.RunWithoutMarshal()
 }
 

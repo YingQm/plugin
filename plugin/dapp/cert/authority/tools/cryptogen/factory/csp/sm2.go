@@ -41,17 +41,10 @@ type sm2KeyGenerator struct {
 }
 
 func (kg *sm2KeyGenerator) KeyGen(opts int) (k Key, err error) {
-	ln := big.NewInt(0).Rsh(sm2.P256Sm2().Params().N, 1)
-	for {
-		privKey, err := sm2.GenerateKey()
-		if err != nil {
-			return nil, fmt.Errorf("Failed generating SM2 key for: [%s]", err)
-		}
-
-		if ln.Cmp(privKey.D) == 1 {
-			//fmt.Println("priv:"+common.ToHex(privKey.D.Bytes()))
-			return &SM2PrivateKey{privKey}, nil
-		}
+	privKey, err := sm2.GenerateKey()
+	if err != nil {
+		return nil, fmt.Errorf("Failed generating SM2 key for: [%s]", err)
 	}
 
+	return &SM2PrivateKey{privKey}, nil
 }

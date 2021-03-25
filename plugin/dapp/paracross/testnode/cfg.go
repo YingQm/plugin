@@ -3,7 +3,7 @@ package testnode
 //DefaultConfig default config for testnode
 var DefaultConfig = `
 Title="user.p.test."
-CoinSymbol="bty"
+CoinSymbol="dpos"
 # TestNet=true
 
 [log]
@@ -11,7 +11,7 @@ CoinSymbol="bty"
 loglevel = "debug"
 logConsoleLevel = "info"
 # 日志文件名，可带目录，所有生成的日志文件都放到此目录下
-logFile = "logs/chain33.para.log"
+logFile = "logs/dplatformos.para.log"
 # 单个日志文件的最大值（单位：兆）
 maxFileSize = 300
 # 最多保存的历史日志文件个数
@@ -97,11 +97,10 @@ targetTimePerBlock = 16
 [mver.consensus.paracross]
 coinReward = 18
 coinDevFund = 12
-minerMode="normal"
 
 
 [consensus.sub.para]
-#主链节点的grpc服务器ip，当前可以支持多ip负载均衡，如“101.37.227.226:8802,39.97.20.242:8802,47.107.15.126:8802,jiedian2.33.cn”
+#主链节点的grpc服务器ip，当前可以支持多ip负载均衡，如“101.37.227.226:28804,39.97.20.242:28804,47.107.15.126:28804,jiedian2.33.cn”
 ParaRemoteGrpcClient=""
 #主链指定高度的区块开始同步
 startHeight=1

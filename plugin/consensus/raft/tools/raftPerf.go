@@ -17,11 +17,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/33cn/chain33/common"
-	"github.com/33cn/chain33/common/address"
-	"github.com/33cn/chain33/common/crypto"
-	rlog "github.com/33cn/chain33/common/log"
-	"github.com/33cn/chain33/types"
+	"github.com/33cn/dplatformos/common"
+	"github.com/33cn/dplatformos/common/address"
+	"github.com/33cn/dplatformos/common/crypto"
+	rlog "github.com/33cn/dplatformos/common/log"
+	"github.com/33cn/dplatformos/types"
 	pty "github.com/33cn/plugin/plugin/dapp/norm/types"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
@@ -31,7 +31,7 @@ const fee = 1e6
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 var conn *grpc.ClientConn
-var c types.Chain33Client
+var c types.DplatformOSClient
 var r *rand.Rand
 
 func createConn(ip string) {
@@ -43,7 +43,7 @@ func createConn(ip string) {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	c = types.NewChain33Client(conn)
+	c = types.NewDplatformOSClient(conn)
 	r = rand.New(rand.NewSource(types.Now().UnixNano()))
 }
 func main() {
@@ -334,8 +334,6 @@ func NormPut(privkey string, key string, value string) {
 	tx := &types.Transaction{Execer: []byte("norm"), Payload: types.Encode(action), Fee: fee}
 	tx.To = address.ExecAddress("norm")
 	tx.Nonce = r.Int63()
-	version, _ := c.Version(context.Background(), nil)
-	tx.ChainID = version.ChainID
 	tx.Sign(types.SECP256K1, getprivkey(privkey))
 
 	reply, err := c.SendTransaction(context.Background(), tx)
