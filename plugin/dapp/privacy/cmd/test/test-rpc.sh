@@ -14,7 +14,7 @@ privacy_CreateRawTransaction() {
 }
 
 privacy_GetPrivacyTxByAddr() {
-    dplatformos_Http '{"method":"privacy.GetPrivacyTxByAddr","params":[{"assetExec":"coins", "tokenname":"DPOM","sendRecvFlag":0,"from":"12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv", "direction":1, "count":1}]}' ${MAIN_HTTP} '.error|not' "$FUNCNAME"
+    dplatformos_Http '{"method":"privacy.GetPrivacyTxByAddr","params":[{"assetExec":"coins", "assetSymbol":"DPOM","sendRecvFlag":0,"address":"12qyocayNF7Lv6C9qW4avxs2E7U41fKSfv", "direction":1, "count":1}]}' ${MAIN_HTTP} '.error|not' "$FUNCNAME"
 }
 
 privacy_ShowPrivacyKey() {

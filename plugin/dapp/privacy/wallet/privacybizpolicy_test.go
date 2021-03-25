@@ -457,7 +457,7 @@ func Test_PrivacyTransactionList(t *testing.T) {
 		},
 		{
 			req: &ty.ReqPrivacyTransactionList{
-				Tokenname:    types.DPOM,
+				AssetSymbol:    types.DPOM,
 				SendRecvFlag: 1,
 				Direction:    0,
 				Count:        10,
